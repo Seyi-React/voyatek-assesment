@@ -13,9 +13,18 @@ const Home = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b py-2 md:py-4">
         <div className="flex items-center justify-between px-2 md:px-6 py-3 w-full">
+          {/* Hamburger for mobile */}
+          <button
+            className="md:hidden mr-2 p-2 rounded hover:bg-gray-100 focus:outline-none"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open sidebar"
+          >
+            <Menu className="w-6 h-6 text-gray-700" />
+          </button>
+
           {/* Left: Logo & Search */}
           <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
-            <img src="/logo.png" alt="TravelPro" className="w-8 h-8 rounded" />
+            <img src="/logo.svg" alt="TravelPro" className="w-8 h-8 rounded" />
             <div className="relative w-28 md:w-36">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -78,7 +87,7 @@ const Home = () => {
           {/* Avatar with Dropdown */}
           <div className="relative ml-2">
             <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none">
-              <img src="/avatar.jpg" alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+              <img src="/woman.svg" alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
             </button>
             {/* Dropdown logic can be added here */}
           </div>
@@ -136,7 +145,8 @@ const Home = () => {
         <main className="flex-1 p-4 md:p-6">
           {/* Trip Header */}
           <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl p-4 md:p-6 text-white relative overflow-hidden">
+            {/* Empty sky blue div with icons */}
+            <div className="relative rounded-2xl p-4 md:p-6" style={{ background: '#CFE9FF', minHeight: '100px' }}>
               <div className="absolute top-4 right-4">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 rounded-full flex items-center justify-center">
                   ☀️
@@ -145,11 +155,19 @@ const Home = () => {
               <div className="absolute bottom-4 right-8 md:right-16">
                 <div className="text-4xl md:text-6xl">🌴</div>
               </div>
+              {/* No text inside this div */}
+            </div>
+            {/* Trip info text and button below the colored div */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-4">
               <div>
-                <p className="text-blue-100 mb-2 text-sm md:text-base">25 February 2024 • 8 day trip</p>
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">Bahamas Family Trip</h2>
-                <p className="text-blue-100 text-sm md:text-base">New York, United States of America → Bahamas</p>
+                <h2 className="text-2xl md:text-2xl font-bold text-black mb-2">Bahamas Family Trip</h2>
+                {/* <p className="text-black mb-1">25 February 2024 • 8 day trip</p> */}
+                <p className="text-black text-gray-600">New York, United States of America → Bahamas</p>
               </div>
+              <button className="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg mt-4 md:mt-0">
+                <User className="w-5 h-5 mr-2" />
+               +
+              </button>
             </div>
           </div>
 
@@ -189,21 +207,16 @@ const Home = () => {
           {/* Trip Itinerary */}
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-4 md:p-6 border-b">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-                <h3 className="text-lg md:text-xl font-semibold">Trip Itinerary</h3>
-                <button className="text-blue-500 hover:text-blue-600">
-                  View in planner
-                </button>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900">Trip Itineraries</h3>
+                 <p className="text-gray-600">Manage your trip itineraries</p>
               </div>
             </div>
             
             <div className="p-4 md:p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2 mb-4">
-                <Plane className="w-5 h-5 text-blue-500" />
-                <span className="font-medium">Flights</span>
-                <button className="text-blue-500 text-sm hover:text-blue-600">
-                  Manage
-                </button>
+                {/* <Plane className="w-5 h-5 text-blue-500" /> */}
+                <span className="font-medium text-gray-900">Flights</span>
               </div>
               
               {/* Flight Cards */}
@@ -212,37 +225,37 @@ const Home = () => {
                   <div key={flight} className="border rounded-lg p-4">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                       <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-xs">AA</span>
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white border">
+                          <img src="/america.svg" alt="American Airlines" className="w-7 h-7 object-contain" />
                         </div>
                         <div>
-                          <p className="font-medium">American Airlines</p>
-                          <p className="text-sm text-gray-600">AA 8034</p>
+                          <p className="font-medium text-gray-900">American Airlines</p>
+                          <p className="text-sm text-gray-900">AA 8034</p>
                         </div>
                       </div>
                       
                       <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
                         <div className="text-center">
-                          <p className="font-semibold">06:35</p>
-                          <p className="text-sm text-gray-600">JFK</p>
+                          <p className="font-semibold text-gray-900">06:35</p>
+                          <p className="text-sm text-gray-900">JFK</p>
                         </div>
                         
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                          <div className="w-16 h-0.5 bg-gray-300"></div>
-                          <Clock className="w-4 h-4 text-gray-400" />
-                          <div className="w-16 h-0.5 bg-gray-300"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                          <div className="w-16 h-0.5 bg-gray-900"></div>
+                          <Clock className="w-4 h-4 text-gray-900" />
+                          <div className="w-16 h-0.5 bg-gray-900"></div>
+                          <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
                         </div>
                         
                         <div className="text-center">
-                          <p className="font-semibold">09:55</p>
-                          <p className="text-sm text-gray-600">NAS</p>
+                          <p className="font-semibold text-gray-900">09:55</p>
+                          <p className="text-sm text-gray-900">NAS</p>
                         </div>
                       </div>
                       
                       <div className="text-right">
-                        <p className="font-bold text-lg">₦123,450.00</p>
+                        <p className="font-bold text-lg text-gray-900">₦123,450.00</p>
                         <button className="text-red-500 hover:text-red-600 text-sm">
                           ✕
                         </button>
