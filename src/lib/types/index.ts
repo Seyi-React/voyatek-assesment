@@ -56,3 +56,32 @@ export interface ItineraryItem {
   data: Hotel | Flight | Activity;
   date: string;
 }
+
+ export interface HotelCardProps {
+  id: string;
+  name: string;
+  location: string;
+  price: string;
+  originalPrice: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  roomType: string;
+  facilities: string[];
+  checkIn: string;
+  checkOut: string;
+  onClose: () => void;
+}
+
+export interface ActivityCardProps {
+  id: string;
+  title: string;
+  description: string;
+  price: string;
+  duration: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  includes: string[];
+  onClose: () => void;
+}

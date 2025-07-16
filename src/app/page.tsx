@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { Search, User, Bell, Calendar, MapPin, Clock, Plane, Menu, LayoutDashboard, Wallet, PlusCircle, ShoppingCart } from 'lucide-react';
+import HotelsAndActivities from '../components/HotelsAndActivities';
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -272,8 +273,11 @@ const Home = () => {
               </div>
             </div>
           </div>
+            <HotelsAndActivities />
         </main>
       </div>
+
+    
     </div>
   );
 };
