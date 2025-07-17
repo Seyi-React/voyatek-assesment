@@ -7,8 +7,8 @@ const NEXT_BASE_URL = process.env.NEXT_BASE_URL || "https://booking-com15.p.rapi
 export const apiClient = axios.create({
   baseURL: NEXT_BASE_URL,
   headers: {
-    'X-RapidAPI-Key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
-    'X-RapidAPI-Host': 'booking-com15.p.rapidapi.com',
+    'x-rapidapi-key':'6272bd8fa2msh774c335bbaadf31p175a37jsna6255257b6e5',
+    'x-rapidapi-host': 'booking-com15.p.rapidapi.com',
     'Content-Type': 'application/json',
   },
 });

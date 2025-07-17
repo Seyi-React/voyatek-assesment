@@ -1,7 +1,8 @@
 import { apiClient } from '../client';
 import { Flight } from '../types';
 
-export const searchFlights = async (params: {
+export const 
+searchFlights = async (params: {
   fromId: string;
   toId: string;
   departDate: string;
