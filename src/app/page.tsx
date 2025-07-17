@@ -1,9 +1,21 @@
-'use client';
+"use client";
 
-
-import React, { useState } from 'react';
-import { Search, User, Bell, Calendar, MapPin, Clock, Plane, Menu, LayoutDashboard, Wallet, PlusCircle, ShoppingCart } from 'lucide-react';
-import HotelsAndActivities from '../components/HotelsAndActivities';
+import React, { useState } from "react";
+import {
+  Search,
+  User,
+  Bell,
+  Calendar,
+  MapPin,
+  Clock,
+  Plane,
+  Menu,
+  LayoutDashboard,
+  Wallet,
+  PlusCircle,
+  ShoppingCart,
+} from "lucide-react";
+import HotelsAndActivities from "../components/HotelsAndActivities";
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,7 +42,7 @@ const Home = () => {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full pl-9 pr-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full bg-gray-100 pl-9 pr-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
           </div>
@@ -57,13 +69,10 @@ const Home = () => {
               <User className="w-5 h-5 mb-1" />
               Commission for Life
             </div>
-               <button className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold mx-2 hidden md:block">
-            Subscribe
-          </button>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold mx-2 hidden md:block">
+              Subscribe
+            </button>
           </nav>
-
-          
-       
 
           {/* Divider */}
           <div className="hidden md:block h-8 border-l border-gray-300 mx-2" />
@@ -87,7 +96,11 @@ const Home = () => {
           {/* Avatar with Dropdown */}
           <div className="relative ml-2">
             <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none">
-              <img src="/woman.svg" alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+              <img
+                src="/woman.svg"
+                alt="Avatar"
+                className="w-8 h-8 rounded-full object-cover"
+              />
             </button>
             {/* Dropdown logic can be added here */}
           </div>
@@ -101,28 +114,28 @@ const Home = () => {
             bg-white shadow-sm h-screen md:h-auto md:static
             w-64 fixed md:relative z-20 top-0 left-0
             transition-transform duration-200
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
             md:translate-x-0
           `}
         >
           <nav className="p-4">
             <ul className="space-y-2">
               {[
-                { name: 'Activities', icon: '📊', active: true },
-                { name: 'Hotels', icon: '🏨' },
-                { name: 'Flights', icon: '✈️' },
-                { name: 'Study', icon: '🎯' },
-                { name: 'Visa', icon: '💬' },
-                { name: 'Immigration', icon: '🚗' },
-                { name: 'Medical', icon: '🏥' },
-                { name: 'Vacation Package', icon: '🏖️' },
+                { name: "Activities", icon: "📊", active: true },
+                { name: "Hotels", icon: "🏨" },
+                { name: "Flights", icon: "✈️" },
+                { name: "Study", icon: "🎯" },
+                { name: "Visa", icon: "💬" },
+                { name: "Immigration", icon: "🚗" },
+                { name: "Medical", icon: "🏥" },
+                { name: "Vacation Package", icon: "🏖️" },
               ].map((item) => (
                 <li key={item.name}>
                   <button
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
                       item.active
-                        ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-500'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? "bg-blue-50 text-blue-400 border-l-4 border-blue-500"
+                        : "text-gray-600 hover:bg-gray-50 text-xs"
                     }`}
                   >
                     <span className="text-lg">{item.icon}</span>
@@ -146,27 +159,47 @@ const Home = () => {
           {/* Trip Header */}
           <div className="mb-8">
             {/* Empty sky blue div with icons */}
-            <div className="relative rounded-2xl p-4 md:p-6" style={{ background: '#CFE9FF', minHeight: '100px' }}>
-              <div className="absolute top-4 right-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 rounded-full flex items-center justify-center">
-                  ☀️
+            <div
+              className="relative rounded-2xl p-4 md:p-6 flex items-center"
+              style={{ background: "#CFE9FF", minHeight: "100px" }}
+            >
+              {/* Left: Clouds and Tree */}
+              <div className="flex items-center space-x-2 md:space-x-4">
+                {/* Clouds */}
+                <div className="flex items-center space-x-1">
+                  <div className="w-6 h-6 bg-white rounded-full opacity-80"></div>
+                  <div className="w-4 h-4 bg-white rounded-full opacity-70 -ml-2"></div>
+                  <div className="w-5 h-5 bg-white rounded-full opacity-60 -ml-2"></div>
                 </div>
+                {/* Tree Image, rotated a bit */}
+                <img
+                  src="/tree.svg"
+                  alt="Tree"
+                  className="w-12 h-12 md:w-20 md:h-20"
+                  style={{ transform: "rotate(-12deg)" }}
+                />
               </div>
-              <div className="absolute bottom-4 right-8 md:right-16">
-                <div className="text-4xl md:text-6xl">🌴</div>
-              </div>
-              {/* No text inside this div */}
+              {/* Sun Image: absolutely positioned top right */}
+              <img
+                src="/sun.svg"
+                alt="Sun"
+                className="absolute top-4 right-4 w-12 h-12 md:w-16 md:h-16"
+                style={{ zIndex: 1 }}
+              />
             </div>
             {/* Trip info text and button below the colored div */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-4">
               <div>
-                <h2 className="text-2xl md:text-2xl font-bold text-black mb-2">Bahamas Family Trip</h2>
+                <h2 className="text-2xl md:text-2xl font-bold text-black mb-2">
+                  Bahamas Family Trip
+                </h2>
                 {/* <p className="text-black mb-1">25 February 2024 • 8 day trip</p> */}
-                <p className="text-black text-gray-600">New York, United States of America → Bahamas</p>
+                <p className="text-black text-gray-600">
+                  New York, United States of America → Bahamas
+                </p>
               </div>
-              <button className="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg mt-4 md:mt-0">
-                <User className="w-5 h-5 mr-2" />
-               +
+              <button className="flex items-center bg-light-blue-600 text-white px-4 py-2 rounded-lg mt-4 md:mt-0">
+                <User className="w-5 h-5 mr-2" />+
               </button>
             </div>
           </div>
@@ -182,7 +215,7 @@ const Home = () => {
                 Add Activities
               </button>
             </div>
-            
+
             <div className="bg-gray-100 p-4 md:p-6 rounded-xl">
               <h3 className="font-semibold mb-2 text-gray-800">Hotels</h3>
               <p className="text-gray-600 text-sm mb-4">
@@ -192,7 +225,7 @@ const Home = () => {
                 Add Hotels
               </button>
             </div>
-            
+
             <div className="bg-blue-500 text-white p-4 md:p-6 rounded-xl">
               <h3 className="font-semibold mb-2">Flights</h3>
               <p className="text-blue-100 text-sm mb-4">
@@ -208,17 +241,19 @@ const Home = () => {
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-4 md:p-6 border-b">
               <div className="flex flex-col gap-2">
-                <h3 className="text-lg md:text-xl font-semibold text-gray-900">Trip Itineraries</h3>
-                 <p className="text-gray-600">Manage your trip itineraries</p>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900">
+                  Trip Itineraries
+                </h3>
+                <p className="text-gray-600">Manage your trip itineraries</p>
               </div>
             </div>
-            
+
             <div className="p-4 md:p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2 mb-4">
                 {/* <Plane className="w-5 h-5 text-blue-500" /> */}
                 <span className="font-medium text-gray-900">Flights</span>
               </div>
-              
+
               {/* Flight Cards */}
               <div className="space-y-4">
                 {[1, 2].map((flight) => (
@@ -226,20 +261,26 @@ const Home = () => {
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                       <div className="flex items-center space-x-4">
                         <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white border">
-                          <img src="/america.svg" alt="American Airlines" className="w-7 h-7 object-contain" />
+                          <img
+                            src="/america.svg"
+                            alt="American Airlines"
+                            className="w-7 h-7 object-contain"
+                          />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">American Airlines</p>
+                          <p className="font-medium text-gray-900">
+                            American Airlines
+                          </p>
                           <p className="text-sm text-gray-900">AA 8034</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
                         <div className="text-center">
                           <p className="font-semibold text-gray-900">06:35</p>
                           <p className="text-sm text-gray-900">JFK</p>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                           <div className="w-16 h-0.5 bg-gray-900"></div>
@@ -247,21 +288,23 @@ const Home = () => {
                           <div className="w-16 h-0.5 bg-gray-900"></div>
                           <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
                         </div>
-                        
+
                         <div className="text-center">
                           <p className="font-semibold text-gray-900">09:55</p>
                           <p className="text-sm text-gray-900">NAS</p>
                         </div>
                       </div>
-                      
+
                       <div className="text-right">
-                        <p className="font-bold text-lg text-gray-900">₦123,450.00</p>
+                        <p className="font-bold text-lg text-gray-900">
+                          ₦123,450.00
+                        </p>
                         <button className="text-red-500 hover:text-red-600 text-sm">
                           ✕
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="mt-4 flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4 text-sm text-gray-600">
                       <span>• Facilities: 🧳 Baggage 20kg</span>
                       <span>• Cabin Baggage: 10kg</span>
@@ -269,7 +312,7 @@ const Home = () => {
                       <span>• In-flight meal: ✓</span>
                       <span>• USB Port</span>
                     </div>
-                    
+
                     <div className="mt-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
                       <button className="text-blue-500 hover:text-blue-600 text-sm">
                         Flight details
@@ -286,11 +329,9 @@ const Home = () => {
               </div>
             </div>
           </div>
-            <HotelsAndActivities />
+          <HotelsAndActivities />
         </main>
       </div>
-
-    
     </div>
   );
 };

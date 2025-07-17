@@ -1,36 +1,67 @@
-// import { apiClient } from './client';
 import { apiClient } from '../client';
-import { Hotel, SearchParams } from '../types';
+import { Flight } from '../types';
 
-export const searchHotels = async (params: SearchParams): Promise<Hotel[]> => {
+export const searchFlights = async (params: {
+  fromId: string;
+  toId: string;
+  departDate: string;
+  returnDate?: string;
+  adults: number;
+  children?: number;
+  cabinClass?: string;
+}): Promise<Flight[]> => {
   try {
-    const response = await apiClient.get('/hotels/searchHotels', {
+    const response = await apiClient.get('/flights/searchFlights', {
       params: {
-        dest_id: params.destination,
-        search_type: 'CITY',
-        arrival_date: params.checkIn,
-        departure_date: params.checkOut,
+        fromId: params.fromId,
+        toId: params.toId,
+        departDate: params.departDate,
+        returnDate: params.returnDate,
         adults: params.adults,
-        children_age: params.children || 0,
-        room_qty: params.rooms || 1,
-        page_number: 1,
-        languagecode: 'en-us',
+        children: params.children || 0,
+        cabinClass: params.cabinClass || 'ECONOMY',
         currency_code: 'USD',
+        market: 'en-US',
       },
     });
 
-    return response.data.data.hotels.map((hotel: any) => ({
-      id: hotel.hotel_id,
-      name: hotel.hotel_name,
-      price: hotel.min_total_price,
+    return response.data.data.flights.map((flight: any) => ({
+      id: flight.id,
+      airline: flight.airline_name,
+      flightNumber: flight.flight_number,
+      departure: {
+        time: flight.departure_time,
+        airport: flight.departure_airport,
+        city: flight.departure_city,
+      },
+      arrival: {
+        time: flight.arrival_time,
+        airport: flight.arrival_airport,
+        city: flight.arrival_city,
+      },
+      price: flight.price,
       currency: 'NGN',
-      rating: hotel.review_score,
-      image: hotel.main_photo_url,
-      location: hotel.address,
-      amenities: hotel.hotel_facilities || [],
+      duration: flight.duration,
+      stops: flight.stops || 0,
     }));
   } catch (error) {
-    console.error('Error searching hotels:', error);
+    console.error('Error searching flights:', error);
+    throw error;
+  }
+};
+
+export const searchAirports = async (query: string): Promise<any[]> => {
+  try {
+    const response = await apiClient.get('/flights/searchAirport', {
+      params: {
+        query,
+        locale: 'en-US',
+      },
+    });
+
+    return response.data.data.airports || [];
+  } catch (error) {
+    console.error('Error searching airports:', error);
     throw error;
   }
 };
