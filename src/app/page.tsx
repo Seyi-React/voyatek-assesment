@@ -79,15 +79,15 @@ const Home = () => {
 
           {/* Right: Secondary Nav */}
           <nav className="hidden md:flex items-end space-x-6 mx-2">
-            <div className="flex flex-col items-center text-xs text-black">
+            <div className="flex flex-col items-center text-xs text-gray-500">
               <Bell className="w-5 h-5 mb-1" />
               Notification
             </div>
-            <div className="flex flex-col items-center text-xs text-black">
+            <div className="flex flex-col items-center text-xs text-gray-500">
               <ShoppingCart className="w-5 h-5 mb-1" />
               Carts
             </div>
-            <div className="flex flex-col items-center text-xs text-black">
+            <div className="flex flex-col items-center text-xs text-gray-500">
               <PlusCircle className="w-5 h-5 mb-1" />
               Create
             </div>

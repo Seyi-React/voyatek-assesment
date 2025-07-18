@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Star, MapPin, Users, Clock, X, Heart, Share2 } from "lucide-react";
 import { HotelCardProps, ActivityCardProps, Flight } from "../lib/types";
 import { searchFlights } from "../lib/api/flights";
+
 import { searchActivities } from "../lib/api/activities";
-// import { searchHotels } from "../lib/api/hotels"; // Implement if you have hotel API
+import { searchHotels } from "../lib/api/hotels";
+
 
 const HotelCard: React.FC<HotelCardProps> = ({
   name,
@@ -243,9 +245,42 @@ const HotelsAndActivities: React.FC = () => {
   const handleHotelSearch = async () => {
     setLoadingHotels(true);
     try {
-      // const results = await searchHotels({ destination: hotelQuery, ... });
-      const results: any[] = []; // Placeholder, implement your hotel API call
-      setHotelResults(results);
+      // TODO: Map hotelQuery to dest_id dynamically. For now, use static dest_id for demo.
+      const results = await searchHotels({
+        dest_id: "-2092174", // Should be dynamic based on hotelQuery
+        arrival_date: "2025-08-14", // Should be dynamic
+        departure_date: "2025-08-28", // Should be dynamic
+        search_type: "CITY",
+        adults: "1",
+        children_age: "0,17",
+        room_qty: "1",
+        page_number: "1",
+        units: "metric",
+        temperature_unit: "c",
+        languagecode: "en-us",
+        currency_code: "AED",
+        location: "US",
+      });
+      // Map API hotel data to HotelCardProps
+      const mapped = results.map((hotel: any) => ({
+        id: hotel.hotel_id || hotel.property?.id,
+        name: hotel.name,
+        location: hotel.accessibilityLabel,
+        price: hotel.property?.priceBreakdown?.grossPrice?.value
+          ? `${hotel.property.priceBreakdown.grossPrice.value} ${hotel.property.priceBreakdown.grossPrice.currency}`
+          : '',
+        originalPrice: hotel.property?.priceBreakdown?.excludedPrice?.value
+          ? `${hotel.property.priceBreakdown.excludedPrice.value} ${hotel.property.priceBreakdown.excludedPrice.currency}`
+          : '',
+        image: hotel.photoUrls?.[0] || '',
+        rating: hotel.reviewScore,
+        reviews: hotel.reviewCount,
+        roomType: hotel.accessibilityLabel?.split('Hotel room :')[1]?.split('.')[0]?.trim() || '',
+        facilities: [], // Not available in API response
+        checkIn: hotel.property?.checkin?.fromTime || '',
+        checkOut: hotel.property?.checkout?.untilTime || '',
+      }));
+      setHotelResults(mapped);
     } catch (e) {
       alert("Error searching hotels");
     }
