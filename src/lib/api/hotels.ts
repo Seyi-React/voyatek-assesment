@@ -16,7 +16,29 @@ export interface HotelSearchParams {
   location?: string;
 }
 
-export const searchHotels = async (params: HotelSearchParams): Promise<any[]> => {
+export interface HotelApiResponse {
+  hotel_id?: string | number;
+  id?: string | number;
+  property?: {
+    name?: string;
+    priceBreakdown?: {
+      grossPrice?: { value?: number };
+      excludedPrice?: { value?: number };
+    };
+    photoUrls?: string[];
+    reviewScore?: number;
+    reviewCount?: number;
+    facilities?: string[];
+  };
+  name?: string;
+  accessibilityLabel?: string;
+  location?: string;
+  main_photo_url?: string;
+  review_score?: number;
+  review_nr?: number;
+}
+
+export const searchHotels = async (params: HotelSearchParams): Promise<HotelApiResponse[]> => {
   try {
     const response = await apiClient.get('/hotels/searchHotels', {
       params: {

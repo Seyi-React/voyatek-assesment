@@ -1,15 +1,15 @@
 import { apiClient } from '../client';
 import { Activity } from '../types';
 
-
-
-export const searchActivities = async (params: {
-  id: string; 
+export interface SearchActivitiesParams {
+  id: string | number;
   sortBy?: string;
   page?: number;
   currency_code?: string;
   languagecode?: string;
-}): Promise<Activity[]> => {
+}
+
+export const searchActivities = async (params: SearchActivitiesParams): Promise<Activity[]> => {
   try {
     const response = await apiClient.get('/attraction/searchAttractions', {
       params: {
@@ -24,7 +24,15 @@ export const searchActivities = async (params: {
     
     const products = response?.data?.data?.products || [];
 
-    return products.map((product: any) => ({
+    return products.map((product: {
+      id: string | number;
+      name: string;
+      shortDescription?: string;
+      representativePrice?: { chargeAmount?: number; currency?: string };
+      reviewsStats?: { combinedNumericStats?: { average?: number } };
+      primaryPhoto?: { small?: string };
+      ufiDetails?: { bCityName?: string };
+    }) => ({
       id: product.id,
       name: product.name,
       description: product.shortDescription,
@@ -34,7 +42,6 @@ export const searchActivities = async (params: {
       rating: product.reviewsStats?.combinedNumericStats?.average,
       image: product.primaryPhoto?.small,
       location: product.ufiDetails?.bCityName,
-  
     }));
   } catch (error) {
     console.error('Error searching activities:', error);

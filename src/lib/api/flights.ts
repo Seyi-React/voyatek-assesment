@@ -1,8 +1,21 @@
 import { apiClient } from '../client';
 import { Flight } from '../types';
 
-export const 
-searchFlights = async (params: {
+export interface FlightOffer {
+  token: string;
+  segments: Array<{
+    carriersData?: Array<{ name?: string; logo?: string }>;
+    flightInfo?: { flightNumber?: string };
+    departureTime?: string;
+    departureAirport?: { name?: string; cityName?: string };
+    arrivalTime?: string;
+    arrivalAirport?: { name?: string; cityName?: string };
+    totalTime?: number;
+  }>;
+  priceBreakdown?: { total?: { units?: number; currencyCode?: string } };
+}
+
+export const searchFlights = async (params: {
   fromId: string;
   toId: string;
   departDate: string;
@@ -32,10 +45,10 @@ searchFlights = async (params: {
     });
 
 
-    const offers = response.data?.data?.flightOffers || [];
-    return offers.map((offer: any) => {
+    const offers: FlightOffer[] = response.data?.data?.flightOffers || [];
+    return offers.map((offer) => {
       const firstSegment = offer.segments?.[0];
-      const lastSegment = offer.segments?.[offer.segments.length - 1];
+      const lastSegment = offer.segments[offer.segments.length - 1];
       const airlineData = firstSegment?.carriersData?.[0] || {};
       const priceObj = offer.priceBreakdown?.total || {};
       return {
@@ -53,9 +66,9 @@ searchFlights = async (params: {
           airport: lastSegment?.arrivalAirport?.name || '',
           city: lastSegment?.arrivalAirport?.cityName || '',
         },
-        price: priceObj.units !== undefined ? `${priceObj.units}${priceObj.currencyCode ? ' ' + priceObj.currencyCode : ''}` : '',
+        price: typeof priceObj.units === 'number' ? priceObj.units : 0,
         currency: priceObj.currencyCode || 'AED',
-        duration: offer.segments?.reduce((acc: number, seg: any) => acc + (seg.totalTime || 0), 0) || 0,
+        duration: offer.segments?.reduce((acc: number, seg) => acc + (seg.totalTime || 0), 0).toString() || '0',
         stops: offer.segments?.length ? offer.segments.length - 1 : 0,
       };
     });
@@ -65,7 +78,15 @@ searchFlights = async (params: {
   }
 };
 
-export const searchAirports = async (query: string): Promise<any[]> => {
+export interface Airport {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+  iata: string;
+}
+
+export const searchAirports = async (query: string): Promise<Airport[]> => {
   try {
     const response = await apiClient.get('/flights/searchAirport', {
       params: {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Search,
   User,
@@ -36,7 +37,7 @@ const Home = () => {
 
           {/* Left: Logo & Search */}
           <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
-            <img src="/logo.svg" alt="TravelPro" className="w-8 h-8 rounded" />
+            <Image src="/logo.svg" alt="TravelPro" width={32} height={32} className="w-8 h-8 rounded" />
             <div className="relative w-28 md:w-36">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -96,9 +97,11 @@ const Home = () => {
           {/* Avatar with Dropdown */}
           <div className="relative ml-1">
             <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none">
-              <img
+              <Image
                 src="/woman.svg"
                 alt="Avatar"
+                width={32}
+                height={32}
                 className="w-8 h-8 rounded-full object-cover"
               />
             </button>
@@ -174,17 +177,21 @@ const Home = () => {
                   <div className="w-5 h-5 bg-white rounded-full opacity-60 -ml-2"></div>
                 </div>
                 {/* Tree Image, rotated a bit */}
-                <img
+                <Image
                   src="/tree.svg"
                   alt="Tree"
+                  width={80}
+                  height={80}
                   className="w-12 h-12 md:w-20 md:h-20"
                   style={{ transform: "rotate(-12deg)" }}
                 />
               </div>
               {/* Sun Image: absolutely positioned top right */}
-              <img
+              <Image
                 src="/sun.svg"
                 alt="Sun"
+                width={64}
+                height={64}
                 className="absolute top-4 right-4 w-12 h-12 md:w-16 md:h-16"
                 style={{ zIndex: 1 }}
               />
@@ -263,9 +270,11 @@ const Home = () => {
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                       <div className="flex items-center space-x-4">
                         <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white border">
-                          <img
+                          <Image
                             src="/america.svg"
                             alt="American Airlines"
+                            width={28}
+                            height={28}
                             className="w-7 h-7 object-contain"
                           />
                         </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Star, MapPin, Users, Clock, X, Heart, Share2, Bed, Calendar, Search, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Star, MapPin, Clock, X, Heart,Bed, Search, Loader2 } from "lucide-react";
 import { searchActivities } from "../lib/api/activities";
 import { searchHotels, HotelSearchParams } from "../lib/api/hotels";
 
@@ -18,10 +19,25 @@ interface HotelCardProps {
   checkIn: string;
   checkOut: string;
   onClose?: () => void;
-  totalPrice?: string;
+  // totalPrice?: string;
+
   nights?: number;
   showInMap?: boolean;
 }
+
+type ActivityApiResult = {
+  id: string | number;
+  name?: string;
+  location?: string;
+  price?: number;
+  currency?: string;
+  image?: string;
+  rating?: number;
+  duration?: string;
+  // add any other fields you use from the API
+};
+
+
 
 interface ActivityCardProps {
   id?: string | number;
@@ -39,7 +55,7 @@ interface ActivityCardProps {
 
 
 const HotelCard: React.FC<HotelCardProps> = ({
-  id,
+  // id,
   name,
   location,
   price,
@@ -52,21 +68,25 @@ const HotelCard: React.FC<HotelCardProps> = ({
   checkIn,
   checkOut,
   onClose,
-  totalPrice,
+  // totalPrice,
   nights = 18,
+
   showInMap = false,
 }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
       <div className="flex">
         <div className="relative w-48 h-36 flex-shrink-0">
-          <img 
-            src={image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"} 
-            alt={name} 
-            className="w-full h-full object-cover" 
+          <Image
+            src={image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"}
+            alt={name}
+            width={192}
+            height={144}
+            className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop";
+              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop";
             }}
+            unoptimized
           />
           <button className="absolute top-3 right-3 p-1.5 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow">
             <Heart className="w-4 h-4 text-gray-600" />
@@ -172,7 +192,7 @@ const HotelCard: React.FC<HotelCardProps> = ({
 };
 
 const ActivityCard: React.FC<ActivityCardProps> = ({
-  id,
+  // id,
   name,
   location,
   price,
@@ -188,13 +208,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
       <div className="flex">
         <div className="relative w-48 h-36 flex-shrink-0">
-          <img 
-            src={image || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop"} 
-            alt={name} 
-            className="w-full h-full object-cover" 
+          <Image
+            src={image || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop"}
+            alt={name}
+            width={192}
+            height={144}
+            className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop";
+              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop";
             }}
+            unoptimized
           />
           <button className="absolute top-3 right-3 p-1.5 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow">
             <Heart className="w-4 h-4 text-gray-600" />
@@ -284,9 +307,32 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   );
 };
 
+
+type HotelApiResult = {
+  hotel_id?: string | number;
+  id?: string | number;
+  property?: {
+    name?: string;
+    priceBreakdown?: {
+      grossPrice?: { value?: number };
+      excludedPrice?: { value?: number };
+    };
+    photoUrls?: string[];
+    reviewScore?: number;
+    reviewCount?: number;
+    facilities?: string[];
+  };
+  name?: string;
+  accessibilityLabel?: string;
+  location?: string;
+  main_photo_url?: string;
+  review_score?: number;
+  review_nr?: number;
+};
+
 const HotelsAndActivities: React.FC = () => {
   // Hotels state
-  const [hotelResults, setHotelResults] = useState<any[]>([]);
+  const [hotelResults, setHotelResults] = useState<HotelCardProps[]>([]);
   const [loadingHotels, setLoadingHotels] = useState(false);
   const [selectedHotels, setSelectedHotels] = useState<HotelCardProps[]>([]);
   const [showHotelSearch, setShowHotelSearch] = useState(false);
@@ -299,7 +345,7 @@ const HotelsAndActivities: React.FC = () => {
   });
 
   // Activities state
-  const [activityResults, setActivityResults] = useState<any[]>([]);
+  const [activityResults, setActivityResults] = useState<ActivityCardProps[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [selectedActivities, setSelectedActivities] = useState<ActivityCardProps[]>([]);
   const [showActivitySearch, setShowActivitySearch] = useState(false);
@@ -330,9 +376,9 @@ const HotelsAndActivities: React.FC = () => {
       };
 
       const results = await searchHotels(searchParams);
-      
-  
-      const mappedResults = results.map((hotel: any) => ({
+
+
+      const mappedResults = results.map((hotel: HotelApiResult) => ({
         id: hotel.hotel_id || hotel.id,
         name: hotel.property?.name || hotel.name || 'Hotel Name',
         location: hotel.accessibilityLabel || hotel.location || 'Location not specified',
@@ -375,8 +421,8 @@ const HotelsAndActivities: React.FC = () => {
         languagecode: 'en-us'
       });
 
-      // Transform API results to your card format
-      const mappedResults = results.map((activity: any) => ({
+      
+      const mappedResults = results.map((activity: ActivityApiResult) => ({
         id: activity.id,
         name: activity.name || 'Activity Name',
         location: activity.location || 'Location not specified',
