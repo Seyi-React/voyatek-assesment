@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import {
   Search,
@@ -17,9 +17,47 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import HotelsAndActivities from "../components/HotelsAndActivities";
+import { useEffect, useState } from "react";
+import { searchFlights } from "../lib/api/flights";
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [flights, setFlights] = useState<any[]>([]);
+  const [loadingFlights, setLoadingFlights] = useState(false);
+  const [showFlightSearch, setShowFlightSearch] = useState(false);
+  const [flightSearchParams, setFlightSearchParams] = useState({
+    fromId: "BOM.AIRPORT",
+    toId: "DEL.AIRPORT",
+    departDate: new Date().toISOString().split("T")[0],
+    adults: 1,
+  });
+  const [hasSearchedFlights, setHasSearchedFlights] = useState(false);
+
+  const isFlightSearchReady =
+    flightSearchParams.fromId.trim() &&
+    flightSearchParams.toId.trim() &&
+    flightSearchParams.departDate.trim() &&
+    flightSearchParams.adults > 0;
+
+  const handleFlightSearch = async () => {
+    if (!isFlightSearchReady) return;
+    setLoadingFlights(true);
+    setHasSearchedFlights(true);
+    try {
+      const results = await searchFlights({
+        ...flightSearchParams,
+      });
+      setFlights(results);
+    } catch (error) {
+      setFlights([]);
+    }
+    setLoadingFlights(false);
+  };
+
+  useEffect(() => {
+    handleFlightSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -259,84 +297,170 @@ const Home = () => {
 
             <div className="p-4 md:p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2 mb-4">
-                {/* <Plane className="w-5 h-5 text-blue-500" /> */}
                 <span className="font-medium text-gray-900">Flights</span>
+                <button
+                  className="ml-2 bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700"
+                  onClick={() => setShowFlightSearch((prev) => !prev)}
+                >
+                  {showFlightSearch ? "Close Search" : "Add/Search Flights"}
+                </button>
               </div>
 
-              {/* Flight Cards */}
-              <div className="space-y-4">
-                {[1, 2].map((flight) => (
-                  <div key={flight} className="border rounded-lg p-4">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white border">
-                          <Image
-                            src="/america.svg"
-                            alt="American Airlines"
-                            width={28}
-                            height={28}
-                            className="w-7 h-7 object-contain"
-                          />
+
+              {/* Flight Search Form */}
+              {showFlightSearch && (
+                <div className="mb-6 space-y-4 bg-gray-50 p-4 rounded-lg border">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">From (Airport ID)</label>
+                      <input
+                        type="text"
+                        value={flightSearchParams.fromId}
+                        onChange={e => setFlightSearchParams(prev => ({ ...prev, fromId: e.target.value }))}
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. BOM.AIRPORT"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">To (Airport ID)</label>
+                      <input
+                        type="text"
+                        value={flightSearchParams.toId}
+                        onChange={e => setFlightSearchParams(prev => ({ ...prev, toId: e.target.value }))}
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. DEL.AIRPORT"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Departure Date</label>
+                      <input
+                        type="date"
+                        value={flightSearchParams.departDate}
+                        onChange={e => setFlightSearchParams(prev => ({ ...prev, departDate: e.target.value }))}
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Adults</label>
+                      <select
+                        value={flightSearchParams.adults}
+                        onChange={e => setFlightSearchParams(prev => ({ ...prev, adults: Number(e.target.value) }))}
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value={1}>1 Adult</option>
+                        <option value={2}>2 Adults</option>
+                        <option value={3}>3 Adults</option>
+                        <option value={4}>4 Adults</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleFlightSearch}
+                    disabled={loadingFlights || !isFlightSearchReady}
+                  >
+                    {loadingFlights ? (
+                      <>
+                        <span className="loader2 w-4 h-4 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4" />
+                        Search Flights
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Flight Cards (API integrated) */}
+              <div
+                className="space-y-4 overflow-x-auto pb-2"
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                  maxHeight: '350px',
+                  overflowY: 'auto',
+                  marginBottom: '1rem',
+                }}
+              >
+                {!hasSearchedFlights ? (
+                  <div className="text-center py-8 text-gray-500">Fill all fields and search to see flights.</div>
+                ) : loadingFlights ? (
+                  <div className="text-center py-8 text-gray-500">Loading flights...</div>
+                ) : flights.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">No flights found.</div>
+                ) : (
+                  flights.map((flight, idx) => (
+                    <div key={flight.id || idx} className="border rounded-lg p-4 min-w-[340px] md:min-w-0">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white border">
+                            <Image
+                              src={flight.airlineLogo || "/america.svg"}
+                              alt={flight.airline || "Airline"}
+                              width={28}
+                              height={28}
+                              className="w-7 h-7 object-contain"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {flight.airline || "Airline"}
+                            </p>
+                            <p className="text-sm text-gray-900">{flight.flightNumber || "-"}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            American Airlines
+
+                        <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
+                          <div className="text-center">
+                            <p className="font-semibold text-gray-900">{flight.departure?.time?.slice(11, 16) || "--:--"}</p>
+                            <p className="text-sm text-gray-900">{flight.departure?.airport || "-"}</p>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            <div className="w-16 h-0.5 bg-gray-900"></div>
+                            <Clock className="w-4 h-4 text-gray-900" />
+                            <div className="w-16 h-0.5 bg-gray-900"></div>
+                            <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
+                          </div>
+
+                          <div className="text-center">
+                            <p className="font-semibold text-gray-900">{flight.arrival?.time?.slice(11, 16) || "--:--"}</p>
+                            <p className="text-sm text-gray-900">{flight.arrival?.airport || "-"}</p>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="font-bold text-lg text-gray-900">
+                            {flight.currency === "NGN" || flight.currency === "₦" ? "₦" : (flight.currency || "")} {flight.price?.toLocaleString()}
                           </p>
-                          <p className="text-sm text-gray-900">AA 8034</p>
+                          <button className="text-red-500 hover:text-red-600 text-sm">
+                            ✕
+                          </button>
                         </div>
                       </div>
 
-                      <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
-                        <div className="text-center">
-                          <p className="font-semibold text-gray-900">06:35</p>
-                          <p className="text-sm text-gray-900">JFK</p>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                          <div className="w-16 h-0.5 bg-gray-900"></div>
-                          <Clock className="w-4 h-4 text-gray-900" />
-                          <div className="w-16 h-0.5 bg-gray-900"></div>
-                          <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
-                        </div>
-
-                        <div className="text-center">
-                          <p className="font-semibold text-gray-900">09:55</p>
-                          <p className="text-sm text-gray-900">NAS</p>
-                        </div>
+                      <div className="mt-4 flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4 text-sm text-gray-600">
+                        <span>• Duration: {Math.floor(Number(flight.duration) / 60)}h {Number(flight.duration) % 60}m</span>
+                        <span>• Stops: {flight.stops}</span>
                       </div>
 
-                      <div className="text-right">
-                        <p className="font-bold text-lg text-gray-900">
-                          ₦123,450.00
-                        </p>
-                        <button className="text-red-500 hover:text-red-600 text-sm">
-                          ✕
+                      <div className="mt-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+                        <button className="text-blue-500 hover:text-blue-600 text-sm">
+                          Flight details
+                        </button>
+                        <button className="text-blue-500 hover:text-blue-600 text-sm">
+                          Price details
+                        </button>
+                        <button className="text-blue-500 hover:text-blue-600 text-sm md:ml-auto">
+                          Edit details
                         </button>
                       </div>
                     </div>
-
-                    <div className="mt-4 flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4 text-sm text-gray-600">
-                      <span>• Facilities: 🧳 Baggage 20kg</span>
-                      <span>• Cabin Baggage: 10kg</span>
-                      <span>• In-flight entertainment: ✓</span>
-                      <span>• In-flight meal: ✓</span>
-                      <span>• USB Port</span>
-                    </div>
-
-                    <div className="mt-3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
-                      <button className="text-blue-500 hover:text-blue-600 text-sm">
-                        Flight details
-                      </button>
-                      <button className="text-blue-500 hover:text-blue-600 text-sm">
-                        Price details
-                      </button>
-                      <button className="text-blue-500 hover:text-blue-600 text-sm md:ml-auto">
-                        Edit details
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>

@@ -37,7 +37,7 @@ export const searchFlights = async (params: {
         adults: 1,
         children: 0,
         cabinClass: 'ECONOMY',
-        currency_code: 'AED',
+        currency_code: 'USD',
         stops: 'none',
         pageNo: params.pageNo || 1,
         sort:'CHEAPEST',
