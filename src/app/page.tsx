@@ -20,9 +20,31 @@ import HotelsAndActivities from "../components/HotelsAndActivities";
 import { useEffect, useState } from "react";
 import { searchFlights } from "../lib/api/flights";
 
+// Define a local type for UI mapping if the imported Flight type does not match
+type FlightCard = {
+  id: string;
+  airline: string;
+  airlineLogo?: string;
+  flightNumber: string;
+  departure: {
+    time: string;
+    airport: string;
+    city?: string;
+  };
+  arrival: {
+    time: string;
+    airport: string;
+    city?: string;
+  };
+  price: number;
+  currency: string;
+  duration: string;
+  stops: number;
+};
+
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [flights, setFlights] = useState<any[]>([]);
+  const [flights, setFlights] = useState<FlightCard[]>([]);
   const [loadingFlights, setLoadingFlights] = useState(false);
   const [showFlightSearch, setShowFlightSearch] = useState(false);
   const [flightSearchParams, setFlightSearchParams] = useState({
@@ -48,7 +70,7 @@ const Home = () => {
         ...flightSearchParams,
       });
       setFlights(results);
-    } catch (error) {
+    } catch {
       setFlights([]);
     }
     setLoadingFlights(false);
