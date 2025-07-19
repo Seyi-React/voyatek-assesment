@@ -4,8 +4,8 @@ import { Activity } from '../types';
 
 
 export const searchActivities = async (params: {
-  id: string; // e.g. "eyJ1ZmkiOi0yMDkyMTc0fQ=="
-  sortBy?: string; // e.g. "trending"
+  id: string; 
+  sortBy?: string;
   page?: number;
   currency_code?: string;
   languagecode?: string;
@@ -16,12 +16,12 @@ export const searchActivities = async (params: {
         id:"eyJ1ZmkiOi0yMDkyMTc0fQ==",
         sortBy: params.sortBy || 'trending',
         page: params.page || 1,
-        currency_code: params.currency_code || 'INR',
-        languagecode: params.languagecode || 'en-us',
+        currency_code:  'EUR',
+        languagecode: 'en-us',
       },
     });
 
-    // Defensive: check structure
+    
     const products = response?.data?.data?.products || [];
 
     return products.map((product: any) => ({

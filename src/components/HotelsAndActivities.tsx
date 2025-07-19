@@ -3,7 +3,7 @@ import { Star, MapPin, Users, Clock, X, Heart, Share2, Bed, Calendar, Search, Lo
 import { searchActivities } from "../lib/api/activities";
 import { searchHotels, HotelSearchParams } from "../lib/api/hotels";
 
-// Your existing interfaces remain the same
+
 interface HotelCardProps {
   id?: string | number;
   name: string;
@@ -37,7 +37,7 @@ interface ActivityCardProps {
   onClose?: () => void;
 }
 
-// Your existing card components remain the same
+
 const HotelCard: React.FC<HotelCardProps> = ({
   id,
   name,
@@ -331,7 +331,7 @@ const HotelsAndActivities: React.FC = () => {
 
       const results = await searchHotels(searchParams);
       
-      // Transform API results to your card format
+  
       const mappedResults = results.map((hotel: any) => ({
         id: hotel.hotel_id || hotel.id,
         name: hotel.property?.name || hotel.name || 'Hotel Name',
@@ -384,9 +384,9 @@ const HotelsAndActivities: React.FC = () => {
           `${activity.currency === 'NGN' ? '₦' : activity.currency} ${activity.price?.toLocaleString() || '0'}` : 'Price unavailable',
         image: activity.image || '',
         rating: activity.rating || 0,
-        reviews: Math.floor(Math.random() * 1000) + 100, // Since reviews aren't in your API response
+        reviews: Math.floor(Math.random() * 1000) + 100,
         duration: activity.duration || '2-3 hours',
-        date: new Date().toISOString().split('T')[0], // Today's date as default
+        date: new Date().toISOString().split('T')[0], 
         time: "10:30 AM"
       }));
 
