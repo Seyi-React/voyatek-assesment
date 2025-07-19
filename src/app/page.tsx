@@ -15,6 +15,8 @@ import {
   Wallet,
   PlusCircle,
   ShoppingCart,
+  Settings,
+  Ellipsis,
 } from "lucide-react";
 import HotelsAndActivities from "../components/HotelsAndActivities";
 import { useEffect, useState } from "react";
@@ -260,18 +262,46 @@ const Home = () => {
             </div>
             {/* Trip info text and button below the colored div */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-4">
-              <div>
-                <h2 className="text-2xl md:text-2xl font-bold text-black mb-2">
-                  Bahamas Family Trip
-                </h2>
-                {/* <p className="text-black mb-1">25 February 2024 • 8 day trip</p> */}
-                <p className="text-black text-gray-600">
-                  New York, United States of America → Bahamas
-                </p>
+              <div className="flex-1 flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                <div>
+                  <h2 className="text-2xl md:text-2xl font-bold text-black mb-2">
+                    Bahamas Family Trip
+                  </h2>
+                  {/* <p className="text-black mb-1">25 February 2024 • 8 day trip</p> */}
+                  <p className="text-black text-gray-600">
+                    New York, United States of America → Bahamas
+                  </p>
+                </div>
+                {/* Right-side custom actions */}
+                <div className="flex flex-col items-end md:items-end gap-2 md:ml-8 mt-4 md:mt-0">
+                  <div className="flex flex-row items-center gap-2">
+                    {/* Lighter sky blue button with only person icon, now wider */}
+                    <button className="flex items-center bg-sky-100 hover:bg-sky-200 text-sky-600 px-6 py-2 rounded-lg font-semibold shadow min-w-[120px] justify-center">
+                      <User className="w-5 h-5" />
+                    </button>
+                    {/* More prominent Plus icon button (Ellipsis in black) */}
+                    <button className="">
+                      <Ellipsis className="w-7 h-7 text-gray-500" />
+                    </button>
+                  </div>
+                  <div className="flex flex-row items-center gap-2 mt-2">
+                    {/* Avatar (bigger) */}
+                    <div className="flex items-center justify-center bg-white border border-gray-300 rounded-full w-12 h-12 overflow-hidden">
+                      <Image
+                        src="/woman.svg"
+                        alt="Avatar"
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 object-cover rounded-full"
+                      />
+                    </div>
+                    {/* Settings icon */}
+                    <button className="flex items-center justify-center bg-white border border-gray-300 rounded-full w-8 h-8 hover:bg-gray-100">
+                      <Settings className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button className="flex items-center bg-light-blue-600 text-white px-4 py-2 rounded-lg mt-4 md:mt-0">
-                <User className="w-5 h-5 mr-2" />+
-              </button>
             </div>
           </div>
 
