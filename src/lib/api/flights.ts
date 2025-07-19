@@ -17,17 +17,17 @@ searchFlights = async (params: {
   try {
     const response = await apiClient.get('/flights/searchFlights', {
       params: {
-        fromId: params.fromId,
-        toId: params.toId,
+        fromId: "BOM.AIRPORT",
+          toId: 'DEL.AIRPORT',
         departDate: params.departDate,
         returnDate: params.returnDate,
-        adults: params.adults,
-        children: params.children || 0,
-        cabinClass: params.cabinClass || 'ECONOMY',
+        adults: 1,
+        children: 0,
+        cabinClass: 'ECONOMY',
         currency_code: 'AED',
-        stops: params.stops || 'none',
+        stops: 'none',
         pageNo: params.pageNo || 1,
-        sort: params.sort || 'FASTEST',
+        sort:'CHEAPEST',
       },
     });
 
