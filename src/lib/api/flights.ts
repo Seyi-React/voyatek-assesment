@@ -31,7 +31,7 @@ searchFlights = async (params: {
       },
     });
 
-    // Map from flightOffers array
+
     const offers = response.data?.data?.flightOffers || [];
     return offers.map((offer: any) => {
       const firstSegment = offer.segments?.[0];

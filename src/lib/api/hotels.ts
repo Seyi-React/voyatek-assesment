@@ -20,19 +20,19 @@ export const searchHotels = async (params: HotelSearchParams): Promise<any[]> =>
   try {
     const response = await apiClient.get('/hotels/searchHotels', {
       params: {
-        dest_id: params.dest_id,
-        search_type: params.search_type || 'CITY',
-        arrival_date: params.arrival_date,
-        departure_date: params.departure_date,
+        dest_id: -2092174,
+        search_type: 'CITY',
+        arrival_date: params.arrival_date || '2025-08-20',
+        departure_date: params.departure_date || '2025-08-27',
         adults: params.adults || '1',
-        children_age: params.children_age || '0,17',
+        children_age: params.children_age || '0',
         room_qty: params.room_qty || '1',
-        page_number: params.page_number || '1',
-        units: params.units || 'metric',
-        temperature_unit: params.temperature_unit || 'c',
-        languagecode: params.languagecode || 'en-us',
-        currency_code: params.currency_code || 'AED',
-        location: params.location || 'US',
+        page_number: '1',
+        units: 'metric',
+        temperature_unit: 'c',
+        languagecode: 'en-us',
+        currency_code: 'USD',
+        location:  'US',
       },
     });
     return response.data.data.hotels || [];

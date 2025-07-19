@@ -48,7 +48,7 @@ const Home = () => {
           </div>
 
           {/* Center: Main Nav (horizontal, icons above text) */}
-          <nav className="hidden md:flex items-end space-x-6 mx-4">
+          <nav className="hidden md:flex items-end space-x-2 mx-2">
             <div className="flex flex-col items-center text-xs text-gray-500">
               <Menu className="w-5 h-5 mb-1" />
               Home
@@ -75,10 +75,10 @@ const Home = () => {
           </nav>
 
           {/* Divider */}
-          <div className="hidden md:block h-8 border-l border-gray-300 mx-2" />
+          <div className="hidden md:block h-8 border-l border-gray-300 mx-1" />
 
           {/* Right: Secondary Nav */}
-          <nav className="hidden md:flex items-end space-x-6 mx-2">
+          <nav className="hidden md:flex items-end space-x-6 mx-0">
             <div className="flex flex-col items-center text-xs text-gray-500">
               <Bell className="w-5 h-5 mb-1" />
               Notification
@@ -94,7 +94,7 @@ const Home = () => {
           </nav>
 
           {/* Avatar with Dropdown */}
-          <div className="relative ml-2">
+          <div className="relative ml-1">
             <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none">
               <img
                 src="/woman.svg"
@@ -102,7 +102,7 @@ const Home = () => {
                 className="w-8 h-8 rounded-full object-cover"
               />
             </button>
-            {/* Dropdown logic can be added here */}
+          
           </div>
         </div>
       </header>
@@ -121,14 +121,14 @@ const Home = () => {
           <nav className="p-4">
             <ul className="space-y-2">
               {[
-                { name: "Activities", icon: "📊", active: true },
-                { name: "Hotels", icon: "🏨" },
-                { name: "Flights", icon: "✈️" },
-                { name: "Study", icon: "🎯" },
-                { name: "Visa", icon: "💬" },
-                { name: "Immigration", icon: "🚗" },
-                { name: "Medical", icon: "🏥" },
-                { name: "Vacation Package", icon: "🏖️" },
+                { name: "Activities", icon: LayoutDashboard, active: true },
+                { name: "Hotels", icon: Wallet },
+                { name: "Flights", icon: Plane },
+                { name: "Study", icon: Calendar },
+                { name: "Visa", icon: Bell },
+                { name: "Immigration", icon: MapPin },
+                { name: "Medical", icon: User },
+                { name: "Vacation Package", icon: ShoppingCart },
               ].map((item) => (
                 <li key={item.name}>
                   <button
@@ -138,7 +138,9 @@ const Home = () => {
                         : "text-gray-600 hover:bg-gray-50 text-xs"
                     }`}
                   >
-                    <span className="text-lg">{item.icon}</span>
+                    <span className="text-lg">
+                      <item.icon className={item.active ? "text-blue-400" : "text-gray-400"} />
+                    </span>
                     <span className="font-medium">{item.name}</span>
                   </button>
                 </li>
@@ -158,7 +160,7 @@ const Home = () => {
         <main className="flex-1 p-4 md:p-6">
           {/* Trip Header */}
           <div className="mb-8">
-            {/* Empty sky blue div with icons */}
+           
             <div
               className="relative rounded-2xl p-4 md:p-6 flex items-center"
               style={{ background: "#CFE9FF", minHeight: "100px" }}

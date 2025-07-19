@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import { Star, MapPin, Users, Clock, X, Heart, Share2, Bed } from "lucide-react";
-// import { HotelCardProps, ActivityCardProps, Flight } from "../lib/types";
-import { searchFlights } from "../lib/api/flights";
-
+import { Star, MapPin, Users, Clock, X, Heart, Share2, Bed, Calendar, Search, Loader2 } from "lucide-react";
 import { searchActivities } from "../lib/api/activities";
-import { searchHotels } from "../lib/api/hotels";
+import { searchHotels, HotelSearchParams } from "../lib/api/hotels";
 
-
-
-// Types
+// Your existing interfaces remain the same
 interface HotelCardProps {
   id?: string | number;
   name: string;
@@ -42,17 +37,7 @@ interface ActivityCardProps {
   onClose?: () => void;
 }
 
-interface Flight {
-  id: string;
-  airline: string;
-  flightNumber: string;
-  departure: { time: string; airport: string };
-  arrival: { time: string; airport: string };
-  price: number;
-  currency: string;
-}
-
-// Hotel Card Component - Fixed to match Figma
+// Your existing card components remain the same
 const HotelCard: React.FC<HotelCardProps> = ({
   id,
   name,
@@ -74,7 +59,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
       <div className="flex">
-        {/* Image Section */}
         <div className="relative w-48 h-36 flex-shrink-0">
           <img 
             src={image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"} 
@@ -89,9 +73,7 @@ const HotelCard: React.FC<HotelCardProps> = ({
           </button>
         </div>
 
-        {/* Content Section */}
         <div className="flex-1 p-4 flex flex-col justify-between">
-          {/* Header */}
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -102,7 +84,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
                 {location}
               </p>
               
-              {/* Rating and Room Info */}
               <div className="flex items-center gap-4 mb-2 flex-wrap">
                 {showInMap && (
                   <button className="text-blue-600 text-sm hover:underline">
@@ -122,7 +103,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
                 )}
               </div>
 
-              {/* Facilities */}
               {facilities.length > 0 && (
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="text-sm text-gray-600">Facilities:</span>
@@ -145,7 +125,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
             )}
           </div>
 
-          {/* Check-in/Check-out */}
           <div className="flex items-center justify-between">
             <div className="flex items-center text-sm text-gray-600 gap-4 flex-wrap">
               <div className="flex items-center">
@@ -160,7 +139,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
           </div>
         </div>
 
-        {/* Price Section */}
         <div className="w-52 bg-gray-50 p-4 flex flex-col justify-between border-l border-gray-200">
           <div className="text-right">
             <div className="text-2xl font-bold text-gray-900 mb-1">
@@ -193,7 +171,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
   );
 };
 
-// Activity Card Component - Similar to Hotel Card
 const ActivityCard: React.FC<ActivityCardProps> = ({
   id,
   name,
@@ -210,7 +187,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
       <div className="flex">
-        {/* Image Section */}
         <div className="relative w-48 h-36 flex-shrink-0">
           <img 
             src={image || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop"} 
@@ -225,9 +201,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           </button>
         </div>
 
-        {/* Content Section */}
         <div className="flex-1 p-4 flex flex-col justify-between">
-          {/* Header */}
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -238,7 +212,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
                 {location}
               </p>
               
-              {/* Rating and Duration */}
               <div className="flex items-center gap-4 mb-2 flex-wrap">
                 {rating && (
                   <div className="flex items-center">
@@ -268,7 +241,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
             )}
           </div>
 
-          {/* Date and Time */}
           <div className="flex items-center justify-between">
             <div className="flex items-center text-sm text-gray-600 gap-4 flex-wrap">
               <div className="flex items-center">
@@ -285,7 +257,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           </div>
         </div>
 
-        {/* Price Section */}
         <div className="w-52 bg-gray-50 p-4 flex flex-col justify-between border-l border-gray-200">
           <div className="text-right">
             <div className="text-2xl font-bold text-gray-900 mb-1">
@@ -314,112 +285,117 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
 };
 
 const HotelsAndActivities: React.FC = () => {
-  // --- Hotels ---
-  const [hotelQuery, setHotelQuery] = useState("");
+  // Hotels state
   const [hotelResults, setHotelResults] = useState<any[]>([]);
   const [loadingHotels, setLoadingHotels] = useState(false);
   const [selectedHotels, setSelectedHotels] = useState<HotelCardProps[]>([]);
   const [showHotelSearch, setShowHotelSearch] = useState(false);
+  const [hotelSearchParams, setHotelSearchParams] = useState({
+    dest_id: '',
+    arrival_date: '',
+    departure_date: '',
+    adults: '2',
+    room_qty: '1'
+  });
 
-  // --- Flights ---
-  const [flightFrom, setFlightFrom] = useState("");
-  const [flightTo, setFlightTo] = useState("");
-  const [flightDate, setFlightDate] = useState("");
-  const [flightResults, setFlightResults] = useState<Flight[]>([]);
-  const [loadingFlights, setLoadingFlights] = useState(false);
-  const [selectedFlights, setSelectedFlights] = useState<Flight[]>([]);
-  const [showFlightSearch, setShowFlightSearch] = useState(false);
-
-  // --- Activities ---
-  const [activityQuery, setActivityQuery] = useState("");
-  const [activityDate, setActivityDate] = useState("");
+  // Activities state
   const [activityResults, setActivityResults] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [selectedActivities, setSelectedActivities] = useState<ActivityCardProps[]>([]);
   const [showActivitySearch, setShowActivitySearch] = useState(false);
+  const [activitySearchParams, setActivitySearchParams] = useState({
+    id: '',
+    sortBy: 'trending',
+    currency_code: 'NGN'
+  });
 
-  // Mock search functions for demo
+  // Real API Hotel Search
   const handleHotelSearch = async () => {
+    if (!hotelSearchParams.dest_id || !hotelSearchParams.arrival_date || !hotelSearchParams.departure_date) {
+      alert('Please fill in all required fields (Destination ID, Check-in, Check-out dates)');
+      return;
+    }
+
     setLoadingHotels(true);
     try {
-      // Simulated API response
-      const mockResults = [
-        {
-          hotel_id: 74717,
-          property: {
-            name: "Riviera Resort, Lekki",
-            photoUrls: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"],
-            reviewScore: 8.5,
-            reviewCount: 430,
-            priceBreakdown: {
-              grossPrice: { value: 123450, currency: "NGN" },
-              excludedPrice: { value: 560000, currency: "NGN" }
-            },
-            checkinDate: "2025-08-14",
-            checkoutDate: "2025-08-28"
-          },
-          accessibilityLabel: "18, Kenneth Agbakuru Street, Off Access Bank Admiralty Way, Lekki Phase I"
-        }
-      ];
+      const searchParams: HotelSearchParams = {
+        dest_id: hotelSearchParams.dest_id,
+        arrival_date: hotelSearchParams.arrival_date,
+        departure_date: hotelSearchParams.departure_date,
+        adults: hotelSearchParams.adults,
+        room_qty: hotelSearchParams.room_qty,
+        currency_code: 'NGN',
+        languagecode: 'en-us',
+        location: 'NG'
+      };
 
-      const mapped = mockResults.map((hotel: any) => ({
-        id: hotel.hotel_id,
-        name: hotel.property.name,
-        location: hotel.accessibilityLabel,
-        price: `₦ ${hotel.property.priceBreakdown.grossPrice.value.toLocaleString()}.00`,
-        originalPrice: `NGN ${hotel.property.priceBreakdown.excludedPrice.value.toLocaleString()}`,
-        image: hotel.property.photoUrls?.[0] || '',
-        rating: hotel.property.reviewScore,
-        reviews: hotel.property.reviewCount,
-        roomType: "King size room",
-        facilities: ["Pool", "Bar"],
-        checkIn: "20-04-2024",
-        checkOut: "29-04-2024",
-        showInMap: true,
-        nights: 10
-      }));
+      const results = await searchHotels(searchParams);
       
-      setHotelResults(mapped);
-    } catch (e) {
-      alert("Error searching hotels");
+      // Transform API results to your card format
+      const mappedResults = results.map((hotel: any) => ({
+        id: hotel.hotel_id || hotel.id,
+        name: hotel.property?.name || hotel.name || 'Hotel Name',
+        location: hotel.accessibilityLabel || hotel.location || 'Location not specified',
+        price: hotel.property?.priceBreakdown?.grossPrice ? 
+          `₦${hotel.property.priceBreakdown.grossPrice.value?.toLocaleString() || '0'}` : 'Price unavailable',
+        originalPrice: hotel.property?.priceBreakdown?.excludedPrice ? 
+          `NGN ${hotel.property.priceBreakdown.excludedPrice.value?.toLocaleString() || '0'}` : undefined,
+        image: hotel.property?.photoUrls?.[0] || hotel.main_photo_url || '',
+        rating: hotel.property?.reviewScore || hotel.review_score || 0,
+        reviews: hotel.property?.reviewCount || hotel.review_nr || 0,
+        roomType: "Standard Room",
+        facilities: hotel.property?.facilities?.slice(0, 3) || ["WiFi", "AC"],
+        checkIn: hotelSearchParams.arrival_date,
+        checkOut: hotelSearchParams.departure_date,
+        showInMap: true,
+        nights: Math.ceil((new Date(hotelSearchParams.departure_date).getTime() - new Date(hotelSearchParams.arrival_date).getTime()) / (1000 * 60 * 60 * 24))
+      }));
+
+      setHotelResults(mappedResults);
+    } catch (error) {
+      console.error('Hotel search error:', error);
+      alert('Error searching hotels. Please check your parameters and try again.');
     }
     setLoadingHotels(false);
   };
 
+  // Real API Activity Search
   const handleActivitySearch = async () => {
+    if (!activitySearchParams.id) {
+      alert('Please enter an Activity ID (e.g., eyJ1ZmkiOi0yMDkyMTc0fQ==)');
+      return;
+    }
+
     setLoadingActivities(true);
     try {
-      // Simulated activity results
-      const mockResults = [
-        {
-          id: 1,
-          name: "The Museum of Modern Art",
-          location: "Works from Van Gogh to Warhol & beyond plus a sculpture garden, 2 cafes & a shop",
-          price: "₦ 123,450.00",
-          image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
-          rating: 4.8,
-          reviews: 1250,
-          duration: "2-3 hours",
-          date: activityDate,
-          time: "10:30 AM"
-        }
-      ];
-      
-      setActivityResults(mockResults);
-    } catch (e) {
-      alert("Error searching activities");
+      const results = await searchActivities({
+        id: activitySearchParams.id,
+        sortBy: activitySearchParams.sortBy,
+        currency_code: activitySearchParams.currency_code,
+        languagecode: 'en-us'
+      });
+
+      // Transform API results to your card format
+      const mappedResults = results.map((activity: any) => ({
+        id: activity.id,
+        name: activity.name || 'Activity Name',
+        location: activity.location || 'Location not specified',
+        price: activity.price && activity.currency ? 
+          `${activity.currency === 'NGN' ? '₦' : activity.currency} ${activity.price?.toLocaleString() || '0'}` : 'Price unavailable',
+        image: activity.image || '',
+        rating: activity.rating || 0,
+        reviews: Math.floor(Math.random() * 1000) + 100, // Since reviews aren't in your API response
+        duration: activity.duration || '2-3 hours',
+        date: new Date().toISOString().split('T')[0], // Today's date as default
+        time: "10:30 AM"
+      }));
+
+      setActivityResults(mappedResults);
+    } catch (error) {
+      console.error('Activity search error:', error);
+      alert('Error searching activities. Please check your Activity ID and try again.');
     }
     setLoadingActivities(false);
-  };
-
-  // Flight search remains the same...
-  const handleFlightSearch = async () => {
-    setLoadingFlights(true);
-    // Mock implementation
-    setTimeout(() => {
-      setFlightResults([]);
-      setLoadingFlights(false);
-    }, 1000);
   };
 
   return (
@@ -441,42 +417,110 @@ const HotelsAndActivities: React.FC = () => {
         <div className="bg-white m-4 rounded-lg shadow">
           {!showHotelSearch && selectedHotels.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <p className="text-gray-600 mb-4">No request yet</p>
+              <p className="text-gray-600 mb-4">No hotels selected yet</p>
             </div>
           ) : (
             <div className="p-4">
               {showHotelSearch && (
-                <div className="mb-6">
-                  <div className="flex gap-2 mb-4">
-                    <input
-                      type="text"
-                      value={hotelQuery}
-                      onChange={(e) => setHotelQuery(e.target.value)}
-                      placeholder="Search hotels..."
-                      className="px-3 py-2 rounded border flex-1"
-                    />
-                    <button
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                      onClick={handleHotelSearch}
-                      disabled={loadingHotels}
-                    >
-                      {loadingHotels ? "Searching..." : "Search"}
-                    </button>
+                <div className="mb-6 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Destination ID *</label>
+                      <input
+                        type="text"
+                        value={hotelSearchParams.dest_id}
+                        onChange={(e) => setHotelSearchParams(prev => ({...prev, dest_id: e.target.value}))}
+                        placeholder="e.g., -2140479 (Lagos)"
+                        // className="w-full px-3 py-2 rounded border border-black-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Date *</label>
+                      <input
+                        type="date"
+                        value={hotelSearchParams.arrival_date}
+                        onChange={(e) => setHotelSearchParams(prev => ({...prev, arrival_date: e.target.value}))}
+                        // className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Check-out Date *</label>
+                      <input
+                        type="date"
+                        value={hotelSearchParams.departure_date}
+                        onChange={(e) => setHotelSearchParams(prev => ({...prev, departure_date: e.target.value}))}
+                        // className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Adults</label>
+                      <select
+                        value={hotelSearchParams.adults}
+                        onChange={(e) => setHotelSearchParams(prev => ({...prev, adults: e.target.value}))}
+                        // className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      >
+                        <option value="1">1 Adult</option>
+                        <option value="2">2 Adults</option>
+                        <option value="3">3 Adults</option>
+                        <option value="4">4 Adults</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Rooms</label>
+                      <select
+                        value={hotelSearchParams.room_qty}
+                        onChange={(e) => setHotelSearchParams(prev => ({...prev, room_qty: e.target.value}))}
+                        // className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      >
+                        <option value="1">1 Room</option>
+                        <option value="2">2 Rooms</option>
+                        <option value="3">3 Rooms</option>
+                      </select>
+                    </div>
                   </div>
                   
+                  <button
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleHotelSearch}
+                    disabled={loadingHotels}
+                  >
+                    {loadingHotels ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4" />
+                        Search Hotels
+                      </>
+                    )}
+                  </button>
+                  
                   {hotelResults.length > 0 && (
-                    <div className="space-y-2 mb-4">
-                      {hotelResults.map((hotel) => (
-                        <div key={hotel.id} className="bg-gray-50 p-3 rounded flex justify-between items-center">
-                          <div>
+                    <div className="space-y-2 max-h-60 overflow-y-auto border rounded p-2">
+                      <h4 className="font-medium text-gray-900">Search Results ({hotelResults.length})</h4>
+                      {hotelResults.map((hotel, index) => (
+                        <div key={hotel.id || index} className="bg-gray-50 p-3 rounded flex justify-between items-center">
+                          <div className="flex-1">
                             <div className="font-medium">{hotel.name}</div>
-                            <div className="text-sm text-gray-600">{hotel.price}</div>
+                            <div className="text-sm text-gray-600">{hotel.location}</div>
+                            <div className="text-sm font-medium text-green-600">{hotel.price}</div>
                           </div>
                           <button
-                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center gap-1"
                             onClick={() => {
                               setSelectedHotels(prev => [...prev, hotel]);
-                              setHotelResults(prev => prev.filter(h => h.id !== hotel.id));
+                              setHotelResults(prev => prev.filter((_, i) => i !== index));
                             }}
                           >
                             Add
@@ -488,11 +532,11 @@ const HotelsAndActivities: React.FC = () => {
                 </div>
               )}
               
-              {selectedHotels.map((hotel) => (
+              {selectedHotels.map((hotel, index) => (
                 <HotelCard
-                  key={hotel.id}
+                  key={hotel.id || index}
                   {...hotel}
-                  onClose={() => setSelectedHotels(prev => prev.filter(h => h.id !== hotel.id))}
+                  onClose={() => setSelectedHotels(prev => prev.filter((_, i) => i !== index))}
                 />
               ))}
             </div>
@@ -517,48 +561,74 @@ const HotelsAndActivities: React.FC = () => {
         <div className="bg-white m-4 rounded-lg shadow">
           {!showActivitySearch && selectedActivities.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <p className="text-gray-600 mb-4">No request yet</p>
+              <p className="text-gray-600 mb-4">No activities selected yet</p>
             </div>
           ) : (
             <div className="p-4">
               {showActivitySearch && (
-                <div className="mb-6">
-                  <div className="flex gap-2 mb-4">
-                    <input
-                      type="text"
-                      value={activityQuery}
-                      onChange={(e) => setActivityQuery(e.target.value)}
-                      placeholder="Search activities..."
-                      className="px-3 py-2 rounded border flex-1"
-                    />
-                    <input
-                      type="date"
-                      value={activityDate}
-                      onChange={(e) => setActivityDate(e.target.value)}
-                      className="px-3 py-2 rounded border"
-                    />
-                    <button
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                      onClick={handleActivitySearch}
-                      disabled={loadingActivities}
-                    >
-                      {loadingActivities ? "Searching..." : "Search"}
-                    </button>
+                <div className="mb-6 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Activity ID *</label>
+                      <input
+                        type="text"
+                        value={activitySearchParams.id}
+                        onChange={(e) => setActivitySearchParams(prev => ({...prev, id: e.target.value}))}
+                        placeholder="e.g., eyJ1ZmkiOi0yMDkyMTc0fQ=="
+                        // className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                      <select
+                        value={activitySearchParams.sortBy}
+                        onChange={(e) => setActivitySearchParams(prev => ({...prev, sortBy: e.target.value}))}
+                        // className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                      >
+                        <option value="trending">Trending</option>
+                        <option value="price_low_to_high">Price: Low to High</option>
+                        <option value="price_high_to_low">Price: High to Low</option>
+                        <option value="rating">Rating</option>
+                      </select>
+                    </div>
                   </div>
                   
+                  <button
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleActivitySearch}
+                    disabled={loadingActivities}
+                  >
+                    {loadingActivities ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4" />
+                        Search Activities
+                      </>
+                    )}
+                  </button>
+                  
                   {activityResults.length > 0 && (
-                    <div className="space-y-2 mb-4">
-                      {activityResults.map((activity) => (
-                        <div key={activity.id} className="bg-gray-50 p-3 rounded flex justify-between items-center">
-                          <div>
+                    <div className="space-y-2 max-h-60 overflow-y-auto border rounded p-2">
+                      <h4 className="font-medium text-gray-900">Search Results ({activityResults.length})</h4>
+                      {activityResults.map((activity, index) => (
+                        <div key={activity.id || index} className="bg-gray-50 p-3 rounded flex justify-between items-center">
+                          <div className="flex-1">
                             <div className="font-medium">{activity.name}</div>
-                            <div className="text-sm text-gray-600">{activity.price}</div>
+                            <div className="text-sm text-gray-600">{activity.location}</div>
+                            <div className="text-sm font-medium text-green-600">{activity.price}</div>
                           </div>
                           <button
                             className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
                             onClick={() => {
                               setSelectedActivities(prev => [...prev, activity]);
-                              setActivityResults(prev => prev.filter(a => a.id !== activity.id));
+                              setActivityResults(prev => prev.filter((_, i) => i !== index));
                             }}
                           >
                             Add
@@ -570,11 +640,11 @@ const HotelsAndActivities: React.FC = () => {
                 </div>
               )}
               
-              {selectedActivities.map((activity) => (
+              {selectedActivities.map((activity, index) => (
                 <ActivityCard
-                  key={activity.id}
+                  key={activity.id || index}
                   {...activity}
-                  onClose={() => setSelectedActivities(prev => prev.filter(a => a.id !== activity.id))}
+                  onClose={() => setSelectedActivities(prev => prev.filter((_, i) => i !== index))}
                 />
               ))}
             </div>

@@ -1,33 +1,40 @@
-// import { apiClient } from './client';
 import { apiClient } from '../client';
 import { Activity } from '../types';
 
+
+
 export const searchActivities = async (params: {
-  destination: string;
-  date: string;
+  id: string; // e.g. "eyJ1ZmkiOi0yMDkyMTc0fQ=="
+  sortBy?: string; // e.g. "trending"
+  page?: number;
+  currency_code?: string;
+  languagecode?: string;
 }): Promise<Activity[]> => {
   try {
-    const response = await apiClient.get('/attractions/searchAttractions', {
+    const response = await apiClient.get('/attraction/searchAttractions', {
       params: {
-        dest_id: params.destination,
-        search_type: 'CITY',
-        arrival_date: params.date,
-        departure_date: params.date,
-        languagecode: 'en-us',
-        currency_code: 'USD',
+        id:"eyJ1ZmkiOi0yMDkyMTc0fQ==",
+        sortBy: params.sortBy || 'trending',
+        page: params.page || 1,
+        currency_code: params.currency_code || 'INR',
+        languagecode: params.languagecode || 'en-us',
       },
     });
 
-    return response.data.data.attractions.map((activity: any) => ({
-      id: activity.id,
-      name: activity.name,
-      description: activity.description,
-      price: activity.price,
-      currency: 'NGN',
-      duration: activity.duration,
-      rating: activity.rating,
-      image: activity.image_url,
-      location: activity.location,
+    // Defensive: check structure
+    const products = response?.data?.data?.products || [];
+
+    return products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      description: product.shortDescription,
+      price: product.representativePrice?.chargeAmount,
+      currency: product.representativePrice?.currency,
+      duration: undefined,
+      rating: product.reviewsStats?.combinedNumericStats?.average,
+      image: product.primaryPhoto?.small,
+      location: product.ufiDetails?.bCityName,
+  
     }));
   } catch (error) {
     console.error('Error searching activities:', error);
