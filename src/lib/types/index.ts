@@ -71,6 +71,9 @@ export interface ItineraryItem {
   checkIn: string;
   checkOut: string;
   onClose: () => void;
+  totalPrice: string;
+  showInMap: boolean;
+  nights: number;
 }
 
 export interface ActivityCardProps {

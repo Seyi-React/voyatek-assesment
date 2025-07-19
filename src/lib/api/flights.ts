@@ -10,6 +10,9 @@ searchFlights = async (params: {
   adults: number;
   children?: number;
   cabinClass?: string;
+  stops?: string; // e.g. 'none', 'any'
+  pageNo?: number;
+  sort?: string; // e.g. 'FASTEST', 'CHEAPEST', 'BEST'
 }): Promise<Flight[]> => {
   try {
     const response = await apiClient.get('/flights/searchFlights', {
@@ -21,30 +24,41 @@ searchFlights = async (params: {
         adults: params.adults,
         children: params.children || 0,
         cabinClass: params.cabinClass || 'ECONOMY',
-        currency_code: 'USD',
-        market: 'en-US',
+        currency_code: 'AED',
+        stops: params.stops || 'none',
+        pageNo: params.pageNo || 1,
+        sort: params.sort || 'FASTEST',
       },
     });
 
-    return response.data.data.flights.map((flight: any) => ({
-      id: flight.id,
-      airline: flight.airline_name,
-      flightNumber: flight.flight_number,
-      departure: {
-        time: flight.departure_time,
-        airport: flight.departure_airport,
-        city: flight.departure_city,
-      },
-      arrival: {
-        time: flight.arrival_time,
-        airport: flight.arrival_airport,
-        city: flight.arrival_city,
-      },
-      price: flight.price,
-      currency: 'NGN',
-      duration: flight.duration,
-      stops: flight.stops || 0,
-    }));
+    // Map from flightOffers array
+    const offers = response.data?.data?.flightOffers || [];
+    return offers.map((offer: any) => {
+      const firstSegment = offer.segments?.[0];
+      const lastSegment = offer.segments?.[offer.segments.length - 1];
+      const airlineData = firstSegment?.carriersData?.[0] || {};
+      const priceObj = offer.priceBreakdown?.total || {};
+      return {
+        id: offer.token,
+        airline: airlineData.name || '',
+        airlineLogo: airlineData.logo || '',
+        flightNumber: firstSegment?.flightInfo?.flightNumber || '',
+        departure: {
+          time: firstSegment?.departureTime || '',
+          airport: firstSegment?.departureAirport?.name || '',
+          city: firstSegment?.departureAirport?.cityName || '',
+        },
+        arrival: {
+          time: lastSegment?.arrivalTime || '',
+          airport: lastSegment?.arrivalAirport?.name || '',
+          city: lastSegment?.arrivalAirport?.cityName || '',
+        },
+        price: priceObj.units !== undefined ? `${priceObj.units}${priceObj.currencyCode ? ' ' + priceObj.currencyCode : ''}` : '',
+        currency: priceObj.currencyCode || 'AED',
+        duration: offer.segments?.reduce((acc: number, seg: any) => acc + (seg.totalTime || 0), 0) || 0,
+        stops: offer.segments?.length ? offer.segments.length - 1 : 0,
+      };
+    });
   } catch (error) {
     console.error('Error searching flights:', error);
     throw error;

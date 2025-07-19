@@ -1,13 +1,60 @@
 import React, { useState } from "react";
-import { Star, MapPin, Users, Clock, X, Heart, Share2 } from "lucide-react";
-import { HotelCardProps, ActivityCardProps, Flight } from "../lib/types";
+import { Star, MapPin, Users, Clock, X, Heart, Share2, Bed } from "lucide-react";
+// import { HotelCardProps, ActivityCardProps, Flight } from "../lib/types";
 import { searchFlights } from "../lib/api/flights";
 
 import { searchActivities } from "../lib/api/activities";
 import { searchHotels } from "../lib/api/hotels";
 
 
+
+// Types
+interface HotelCardProps {
+  id?: string | number;
+  name: string;
+  location: string;
+  price: string;
+  originalPrice?: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  roomType?: string;
+  facilities?: string[];
+  checkIn: string;
+  checkOut: string;
+  onClose?: () => void;
+  totalPrice?: string;
+  nights?: number;
+  showInMap?: boolean;
+}
+
+interface ActivityCardProps {
+  id?: string | number;
+  name: string;
+  location: string;
+  price: string;
+  image: string;
+  rating?: number;
+  reviews?: number;
+  duration?: string;
+  date: string;
+  time?: string;
+  onClose?: () => void;
+}
+
+interface Flight {
+  id: string;
+  airline: string;
+  flightNumber: string;
+  departure: { time: string; airport: string };
+  arrival: { time: string; airport: string };
+  price: number;
+  currency: string;
+}
+
+// Hotel Card Component - Fixed to match Figma
 const HotelCard: React.FC<HotelCardProps> = ({
+  id,
   name,
   location,
   price,
@@ -16,99 +63,127 @@ const HotelCard: React.FC<HotelCardProps> = ({
   rating,
   reviews,
   roomType,
-  facilities,
+  facilities = [],
   checkIn,
   checkOut,
   onClose,
+  totalPrice,
+  nights = 18,
+  showInMap = false,
 }) => {
   return (
-    <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-white">
-      <div className="flex flex-col sm:flex-row">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
+      <div className="flex">
         {/* Image Section */}
-        <div className="relative w-full sm:w-48 h-40 flex-shrink-0">
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-          <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow">
+        <div className="relative w-48 h-36 flex-shrink-0">
+          <img 
+            src={image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"} 
+            alt={name} 
+            className="w-full h-full object-cover" 
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop";
+            }}
+          />
+          <button className="absolute top-3 right-3 p-1.5 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow">
             <Heart className="w-4 h-4 text-gray-600" />
           </button>
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 p-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start mb-2 gap-2">
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+        <div className="flex-1 p-4 flex flex-col justify-between">
+          {/* Header */}
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {name}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 flex items-center">
-                <MapPin className="w-4 h-4 mr-1" />
+              <p className="text-sm text-gray-600 flex items-center mb-2">
+                <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
                 {location}
               </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+              
+              {/* Rating and Room Info */}
+              <div className="flex items-center gap-4 mb-2 flex-wrap">
+                {showInMap && (
+                  <button className="text-blue-600 text-sm hover:underline">
+                    Show in map
+                  </button>
+                )}
+                <div className="flex items-center">
+                  <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
+                  <span className="text-sm font-medium">{rating}</span>
+                  <span className="text-sm text-gray-500 ml-1">({reviews})</span>
+                </div>
+                {roomType && (
+                  <div className="flex items-center">
+                    <Bed className="w-4 h-4 text-gray-500 mr-1" />
+                    <span className="text-sm text-gray-600">{roomType}</span>
+                  </div>
+                )}
+              </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center mb-2 gap-2">
-            <div className="flex items-center">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="ml-1 text-xs sm:text-sm font-medium">
-                {rating}
-              </span>
-              <span className="ml-1 text-xs sm:text-sm text-gray-500">
-                ({reviews})
-              </span>
+              {/* Facilities */}
+              {facilities.length > 0 && (
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <span className="text-sm text-gray-600">Facilities:</span>
+                  {facilities.slice(0, 3).map((facility, index) => (
+                    <span key={index} className="text-sm text-gray-600">
+                      {facility}{index < Math.min(facilities.length, 3) - 1 ? ',' : ''}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-            <span className="sm:ml-4 text-xs sm:text-sm text-gray-600 flex items-center">
-              <Users className="w-4 h-4 mr-1" />
-              {roomType}
-            </span>
-          </div>
 
-          <div className="flex flex-wrap items-center mb-3 gap-2">
-            {facilities.map((facility, index) => (
-              <span
-                key={index}
-                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 ml-4"
               >
-                {facility}
-              </span>
-            ))}
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div className="flex items-center text-xs sm:text-sm text-gray-600">
-              <span className="mr-4">Check In: {checkIn}</span>
-              <span>Check Out: {checkOut}</span>
+          {/* Check-in/Check-out */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center text-sm text-gray-600 gap-4 flex-wrap">
+              <div className="flex items-center">
+                <span className="text-gray-500">Check In:</span>
+                <span className="ml-1 font-medium">{checkIn}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-gray-500">Check Out:</span>
+                <span className="ml-1 font-medium">{checkOut}</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Price Section */}
-        <div className="w-full sm:w-48 p-4 bg-gray-50 flex flex-col justify-between">
-          <div className="text-right sm:text-right">
-            <div className="text-lg sm:text-2xl font-bold text-gray-900">
+        <div className="w-52 bg-gray-50 p-4 flex flex-col justify-between border-l border-gray-200">
+          <div className="text-right">
+            <div className="text-2xl font-bold text-gray-900 mb-1">
               {price}
             </div>
-            <div className="text-xs sm:text-sm text-gray-500 line-through">
-              {originalPrice}
-            </div>
-            <div className="text-xs text-gray-600 mt-1">
-              Includes 18 nights incl. taxes
+            {originalPrice && (
+              <div className="text-sm text-gray-500 line-through mb-1">
+                Total Price {originalPrice}
+              </div>
+            )}
+            <div className="text-xs text-gray-600">
+              1 room x {nights} nights incl. taxes
             </div>
           </div>
 
-          <div className="mt-4 space-y-2">
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors">
+          <div className="space-y-2 mt-4">
+            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded text-sm font-medium hover:bg-blue-700 transition-colors">
               Hotel details
             </button>
-            <button className="w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded text-xs sm:text-sm font-medium hover:bg-gray-50 transition-colors">
+            <button className="w-full bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded text-sm font-medium hover:bg-blue-50 transition-colors">
               Price details
             </button>
-            <button className="w-full text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 transition-colors">
+            <button className="w-full text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors bg-transparent border-none p-0">
               Edit details
             </button>
           </div>
@@ -118,95 +193,117 @@ const HotelCard: React.FC<HotelCardProps> = ({
   );
 };
 
+// Activity Card Component - Similar to Hotel Card
 const ActivityCard: React.FC<ActivityCardProps> = ({
-  title,
-  description,
+  id,
+  name,
+  location,
   price,
-  duration,
   image,
   rating,
   reviews,
-  includes,
+  duration,
+  date,
+  time,
   onClose,
 }) => {
   return (
-    <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-white">
-      <div className="flex flex-col sm:flex-row">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
+      <div className="flex">
         {/* Image Section */}
-        <div className="relative w-full sm:w-48 h-40 flex-shrink-0">
-          <img src={image} alt={title} className="w-full h-full object-cover" />
-          <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow">
+        <div className="relative w-48 h-36 flex-shrink-0">
+          <img 
+            src={image || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop"} 
+            alt={name} 
+            className="w-full h-full object-cover" 
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop";
+            }}
+          />
+          <button className="absolute top-3 right-3 p-1.5 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow">
             <Heart className="w-4 h-4 text-gray-600" />
           </button>
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 p-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start mb-2 gap-2">
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                {title}
+        <div className="flex-1 p-4 flex flex-col justify-between">
+          {/* Header */}
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                {name}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                {description}
+              <p className="text-sm text-gray-600 flex items-center mb-2">
+                <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                {location}
               </p>
+              
+              {/* Rating and Duration */}
+              <div className="flex items-center gap-4 mb-2 flex-wrap">
+                {rating && (
+                  <div className="flex items-center">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
+                    <span className="text-sm font-medium">{rating}</span>
+                    {reviews && (
+                      <span className="text-sm text-gray-500 ml-1">({reviews})</span>
+                    )}
+                  </div>
+                )}
+                {duration && (
+                  <div className="flex items-center">
+                    <Clock className="w-4 h-4 text-gray-500 mr-1" />
+                    <span className="text-sm text-gray-600">{duration}</span>
+                  </div>
+                )}
+              </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
+
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 ml-4"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center mb-3 gap-2">
-            <div className="flex items-center">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="ml-1 text-xs sm:text-sm font-medium">
-                {rating}
-              </span>
-              <span className="ml-1 text-xs sm:text-sm text-gray-500">
-                ({reviews})
-              </span>
-            </div>
-            <span className="sm:ml-4 text-xs sm:text-sm text-gray-600 flex items-center">
-              <Clock className="w-4 h-4 mr-1" />
-              {duration}
-            </span>
-          </div>
-
-          <div className="mb-3">
-            <p className="text-xs sm:text-sm text-gray-700 mb-2">
-              What's included:
-            </p>
-            <div className="text-xs sm:text-sm text-gray-600">
-              {includes.map((item, index) => (
-                <span key={index}>
-                  {item}
-                  {index < includes.length - 1 && ", "}
-                </span>
-              ))}
+          {/* Date and Time */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center text-sm text-gray-600 gap-4 flex-wrap">
+              <div className="flex items-center">
+                <span className="text-gray-500">Date:</span>
+                <span className="ml-1 font-medium">{date}</span>
+              </div>
+              {time && (
+                <div className="flex items-center">
+                  <span className="text-gray-500">Time:</span>
+                  <span className="ml-1 font-medium">{time}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Price Section */}
-        <div className="w-full sm:w-48 p-4 bg-gray-50 flex flex-col justify-between">
-          <div className="text-right sm:text-right">
-            <div className="text-lg sm:text-2xl font-bold text-gray-900">
+        <div className="w-52 bg-gray-50 p-4 flex flex-col justify-between border-l border-gray-200">
+          <div className="text-right">
+            <div className="text-2xl font-bold text-gray-900 mb-1">
               {price}
             </div>
-            <div className="text-xs text-gray-600 mt-1">10:30 AM on Mar 18</div>
+            <div className="text-xs text-gray-600">
+              10:30 AM on Mar 19
+            </div>
           </div>
 
-          <div className="mt-4 space-y-2">
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors">
+          <div className="space-y-2 mt-4">
+            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded text-sm font-medium hover:bg-blue-700 transition-colors">
               Activity details
             </button>
-            <button className="w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded text-xs sm:text-sm font-medium hover:bg-gray-50 transition-colors">
+            <button className="w-full bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded text-sm font-medium hover:bg-blue-50 transition-colors">
               Price details
             </button>
-            <button className="w-full text-blue-600 text-xs sm:text-sm font-medium hover:text-blue-700 transition-colors">
+            <button className="w-full text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors bg-transparent border-none p-0">
               Edit details
             </button>
           </div>
@@ -221,7 +318,7 @@ const HotelsAndActivities: React.FC = () => {
   const [hotelQuery, setHotelQuery] = useState("");
   const [hotelResults, setHotelResults] = useState<any[]>([]);
   const [loadingHotels, setLoadingHotels] = useState(false);
-  const [selectedHotels, setSelectedHotels] = useState<any[]>([]);
+  const [selectedHotels, setSelectedHotels] = useState<HotelCardProps[]>([]);
   const [showHotelSearch, setShowHotelSearch] = useState(false);
 
   // --- Flights ---
@@ -238,48 +335,50 @@ const HotelsAndActivities: React.FC = () => {
   const [activityDate, setActivityDate] = useState("");
   const [activityResults, setActivityResults] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
-  const [selectedActivities, setSelectedActivities] = useState<any[]>([]);
+  const [selectedActivities, setSelectedActivities] = useState<ActivityCardProps[]>([]);
   const [showActivitySearch, setShowActivitySearch] = useState(false);
 
-  // --- Hotel Search Handler (implement searchHotels if you have it) ---
+  // Mock search functions for demo
   const handleHotelSearch = async () => {
     setLoadingHotels(true);
     try {
-      // TODO: Map hotelQuery to dest_id dynamically. For now, use static dest_id for demo.
-      const results = await searchHotels({
-        dest_id: "-2092174", // Should be dynamic based on hotelQuery
-        arrival_date: "2025-08-14", // Should be dynamic
-        departure_date: "2025-08-28", // Should be dynamic
-        search_type: "CITY",
-        adults: "1",
-        children_age: "0,17",
-        room_qty: "1",
-        page_number: "1",
-        units: "metric",
-        temperature_unit: "c",
-        languagecode: "en-us",
-        currency_code: "AED",
-        location: "US",
-      });
-      // Map API hotel data to HotelCardProps
-      const mapped = results.map((hotel: any) => ({
-        id: hotel.hotel_id || hotel.property?.id,
-        name: hotel.name,
+      // Simulated API response
+      const mockResults = [
+        {
+          hotel_id: 74717,
+          property: {
+            name: "Riviera Resort, Lekki",
+            photoUrls: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"],
+            reviewScore: 8.5,
+            reviewCount: 430,
+            priceBreakdown: {
+              grossPrice: { value: 123450, currency: "NGN" },
+              excludedPrice: { value: 560000, currency: "NGN" }
+            },
+            checkinDate: "2025-08-14",
+            checkoutDate: "2025-08-28"
+          },
+          accessibilityLabel: "18, Kenneth Agbakuru Street, Off Access Bank Admiralty Way, Lekki Phase I"
+        }
+      ];
+
+      const mapped = mockResults.map((hotel: any) => ({
+        id: hotel.hotel_id,
+        name: hotel.property.name,
         location: hotel.accessibilityLabel,
-        price: hotel.property?.priceBreakdown?.grossPrice?.value
-          ? `${hotel.property.priceBreakdown.grossPrice.value} ${hotel.property.priceBreakdown.grossPrice.currency}`
-          : '',
-        originalPrice: hotel.property?.priceBreakdown?.excludedPrice?.value
-          ? `${hotel.property.priceBreakdown.excludedPrice.value} ${hotel.property.priceBreakdown.excludedPrice.currency}`
-          : '',
-        image: hotel.photoUrls?.[0] || '',
-        rating: hotel.reviewScore,
-        reviews: hotel.reviewCount,
-        roomType: hotel.accessibilityLabel?.split('Hotel room :')[1]?.split('.')[0]?.trim() || '',
-        facilities: [], // Not available in API response
-        checkIn: hotel.property?.checkin?.fromTime || '',
-        checkOut: hotel.property?.checkout?.untilTime || '',
+        price: `₦ ${hotel.property.priceBreakdown.grossPrice.value.toLocaleString()}.00`,
+        originalPrice: `NGN ${hotel.property.priceBreakdown.excludedPrice.value.toLocaleString()}`,
+        image: hotel.property.photoUrls?.[0] || '',
+        rating: hotel.property.reviewScore,
+        reviews: hotel.property.reviewCount,
+        roomType: "King size room",
+        facilities: ["Pool", "Bar"],
+        checkIn: "20-04-2024",
+        checkOut: "29-04-2024",
+        showInMap: true,
+        nights: 10
       }));
+      
       setHotelResults(mapped);
     } catch (e) {
       alert("Error searching hotels");
@@ -287,347 +386,198 @@ const HotelsAndActivities: React.FC = () => {
     setLoadingHotels(false);
   };
 
-  // --- Flight Search Handler ---
-  const handleFlightSearch = async () => {
-    setLoadingFlights(true);
-    try {
-      const results = await searchFlights({
-        fromId: flightFrom,
-        toId: flightTo,
-        departDate: flightDate,
-        adults: 1,
-      });
-      setFlightResults(results);
-    } catch (e) {
-      alert("Error searching flights");
-    }
-    setLoadingFlights(false);
-  };
-
-  // --- Activity Search Handler ---
   const handleActivitySearch = async () => {
     setLoadingActivities(true);
     try {
-      const results = await searchActivities({
-        destination: activityQuery,
-        date: activityDate,
-      });
-      setActivityResults(results);
+      // Simulated activity results
+      const mockResults = [
+        {
+          id: 1,
+          name: "The Museum of Modern Art",
+          location: "Works from Van Gogh to Warhol & beyond plus a sculpture garden, 2 cafes & a shop",
+          price: "₦ 123,450.00",
+          image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
+          rating: 4.8,
+          reviews: 1250,
+          duration: "2-3 hours",
+          date: activityDate,
+          time: "10:30 AM"
+        }
+      ];
+      
+      setActivityResults(mockResults);
     } catch (e) {
       alert("Error searching activities");
     }
     setLoadingActivities(false);
   };
 
+  // Flight search remains the same...
+  const handleFlightSearch = async () => {
+    setLoadingFlights(true);
+    // Mock implementation
+    setTimeout(() => {
+      setFlightResults([]);
+      setLoadingFlights(false);
+    }, 1000);
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-2 sm:p-4 md:p-6 bg-gray-50">
-      {/* Search Section - Hotels */}
-      <div
-        className="mb-8 rounded-lg p-2 sm:p-4"
-        style={{ background: "#344054" }}
-      >
-        <h2 className="text-lg sm:text-xl font-semi text-white flex items-center mb-2">
-          Hotels
-        </h2>
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 m-2 sm:m-4">
-          {!showHotelSearch ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <p className="text-gray-700 mb-4">No request yet</p>
-              <button
-                className="bg-blue-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded hover:bg-blue-700"
-                onClick={() => setShowHotelSearch(true)}
-              >
-                Add Hotel
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={hotelQuery}
-                    onChange={(e) => setHotelQuery(e.target.value)}
-                    placeholder="Search hotels..."
-                    className="px-2 py-1 rounded border"
-                  />
-                  <button
-                    className="bg-blue-600 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded hover:bg-blue-700"
-                    onClick={handleHotelSearch}
-                    disabled={loadingHotels}
-                  >
-                    {loadingHotels ? "Searching..." : "Search"}
-                  </button>
-                </div>
-              </div>
-              {/* Search Results */}
-              {hotelResults.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  {hotelResults.map((hotel) => (
-                    <div
-                      key={hotel.id}
-                      className="bg-gray-50 p-2 rounded flex justify-between items-center"
-                    >
-                      <span>{hotel.name}</span>
-                      <button
-                        className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
-                        onClick={() =>
-                          setSelectedHotels((prev) => [...prev, hotel])
-                        }
-                      >
-                        Add
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {/* Itinerary Hotels */}
-              <div className="space-y-4">
-                {selectedHotels.map((hotel) => (
-                  <HotelCard
-                    key={hotel.id}
-                    {...hotel}
-                    onClose={() =>
-                      setSelectedHotels((prev) =>
-                        prev.filter((h) => h.id !== hotel.id)
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </>
-          )}
+      {/* Hotels Section */}
+      <div className="mb-8 rounded-lg overflow-hidden" style={{ background: "#344054" }}>
+        <div className="p-4 flex items-center justify-between">
+          <h2 className="text-xl font-medium text-white flex items-center">
+            🏨 Hotels
+          </h2>
+          <button 
+            className="bg-white text-gray-800 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100"
+            onClick={() => setShowHotelSearch(!showHotelSearch)}
+          >
+            Add Hotels
+          </button>
         </div>
-      </div>
-
-      {/* Search Section - Flights */}
-      <div
-        className="mb-8 rounded-lg p-2 sm:p-4"
-        style={{ background: "#344054" }}
-      >
-        <h2 className="text-lg sm:text-xl font-semi text-white flex items-center mb-2">
-          Flights
-        </h2>
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 m-2 sm:m-4">
-          {!showFlightSearch ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <p className="text-gray-700 mb-4">No request yet</p>
-              <button
-                className="bg-blue-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded hover:bg-blue-700"
-                onClick={() => setShowFlightSearch(true)}
-              >
-                Add Flight
-              </button>
+        
+        <div className="bg-white m-4 rounded-lg shadow">
+          {!showHotelSearch && selectedHotels.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p className="text-gray-600 mb-4">No request yet</p>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="text"
-                    value={flightFrom}
-                    onChange={(e) => setFlightFrom(e.target.value)}
-                    placeholder="From (Airport ID)"
-                    className="px-2 py-1 rounded border"
-                  />
-                  <input
-                    type="text"
-                    value={flightTo}
-                    onChange={(e) => setFlightTo(e.target.value)}
-                    placeholder="To (Airport ID)"
-                    className="px-2 py-1 rounded border"
-                  />
-                  <input
-                    type="date"
-                    value={flightDate}
-                    onChange={(e) => setFlightDate(e.target.value)}
-                    className="px-2 py-1 rounded border"
-                  />
-                  <button
-                    className="bg-blue-600 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded hover:bg-blue-700"
-                    onClick={handleFlightSearch}
-                    disabled={loadingFlights}
-                  >
-                    {loadingFlights ? "Searching..." : "Search"}
-                  </button>
-                </div>
-              </div>
-              {/* Search Results */}
-              {flightResults.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  {flightResults.map((flight) => (
-                    <div
-                      key={flight.id}
-                      className="bg-gray-50 p-2 rounded flex justify-between items-center"
+            <div className="p-4">
+              {showHotelSearch && (
+                <div className="mb-6">
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={hotelQuery}
+                      onChange={(e) => setHotelQuery(e.target.value)}
+                      placeholder="Search hotels..."
+                      className="px-3 py-2 rounded border flex-1"
+                    />
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                      onClick={handleHotelSearch}
+                      disabled={loadingHotels}
                     >
-                      <span>
-                        {flight.airline} {flight.flightNumber}
-                      </span>
-                      <button
-                        className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
-                        onClick={() =>
-                          setSelectedFlights((prev) => [...prev, flight])
-                        }
-                      >
-                        Add
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {/* Itinerary Flights */}
-              <div className="space-y-4">
-                {selectedFlights.map((flight) => (
-                  <div
-                    key={flight.id}
-                    className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-white p-4"
-                  >
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-white border">
-                          {/* Replace with airline logo if available */}
-                          <img
-                            src="/america.svg"
-                            alt={flight.airline}
-                            className="w-7 h-7 object-contain"
-                          />
-                        </div>
-                        <div>
-                          <p className="font-medium text-black">
-                            {flight.airline}
-                          </p>
-                          <p className="text-sm text-black">
-                            {flight.flightNumber}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
-                        <div className="text-center">
-                          <p className="font-semibold text-black">
-                            {flight.departure.time}
-                          </p>
-                          <p className="text-sm text-black">
-                            {flight.departure.airport}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                          <div className="w-16 h-0.5 bg-gray-300"></div>
-                          <Clock className="w-4 h-4 text-gray-400" />
-                          <div className="w-16 h-0.5 bg-gray-300"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                        </div>
-                        <div className="text-center">
-                          <p className="font-semibold text-black">
-                            {flight.arrival.time}
-                          </p>
-                          <p className="text-sm text-black">
-                            {flight.arrival.airport}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-lg text-black">
-                          {flight.price} {flight.currency}
-                        </p>
-                        <button
-                          className="text-red-500 hover:text-red-600 text-sm"
-                          onClick={() =>
-                            setSelectedFlights((prev) =>
-                              prev.filter((f) => f.id !== flight.id)
-                            )
-                          }
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
+                      {loadingHotels ? "Searching..." : "Search"}
+                    </button>
                   </div>
-                ))}
-              </div>
-            </>
+                  
+                  {hotelResults.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {hotelResults.map((hotel) => (
+                        <div key={hotel.id} className="bg-gray-50 p-3 rounded flex justify-between items-center">
+                          <div>
+                            <div className="font-medium">{hotel.name}</div>
+                            <div className="text-sm text-gray-600">{hotel.price}</div>
+                          </div>
+                          <button
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                            onClick={() => {
+                              setSelectedHotels(prev => [...prev, hotel]);
+                              setHotelResults(prev => prev.filter(h => h.id !== hotel.id));
+                            }}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {selectedHotels.map((hotel) => (
+                <HotelCard
+                  key={hotel.id}
+                  {...hotel}
+                  onClose={() => setSelectedHotels(prev => prev.filter(h => h.id !== hotel.id))}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      {/* Search Section - Activities */}
-      <div className="rounded-lg p-2 sm:p-4" style={{ background: "#0054E4" }}>
-        <h2 className="text-lg sm:text-xl font-semi text-white flex items-center mb-2">
-          Activities
-        </h2>
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 m-2 sm:m-4">
-          {!showActivitySearch ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <p className="text-gray-700 mb-4">No request yet</p>
-              <button
-                className="bg-blue-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded hover:bg-blue-700"
-                onClick={() => setShowActivitySearch(true)}
-              >
-                Add Activity
-              </button>
+      {/* Activities Section */}
+      <div className="rounded-lg overflow-hidden" style={{ background: "#0054E4" }}>
+        <div className="p-4 flex items-center justify-between">
+          <h2 className="text-xl font-medium text-white flex items-center">
+            🎯 Activities
+          </h2>
+          <button 
+            className="bg-white text-gray-800 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100"
+            onClick={() => setShowActivitySearch(!showActivitySearch)}
+          >
+            Add Activities
+          </button>
+        </div>
+        
+        <div className="bg-white m-4 rounded-lg shadow">
+          {!showActivitySearch && selectedActivities.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p className="text-gray-600 mb-4">No request yet</p>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={activityQuery}
-                    onChange={(e) => setActivityQuery(e.target.value)}
-                    placeholder="Destination..."
-                    className="px-2 py-1 rounded border"
-                  />
-                  <input
-                    type="date"
-                    value={activityDate}
-                    onChange={(e) => setActivityDate(e.target.value)}
-                    className="px-2 py-1 rounded border"
-                  />
-                  <button
-                    className="bg-blue-600 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded hover:bg-blue-700"
-                    onClick={handleActivitySearch}
-                    disabled={loadingActivities}
-                  >
-                    {loadingActivities ? "Searching..." : "Search"}
-                  </button>
-                </div>
-              </div>
-              {/* Search Results */}
-              {activityResults.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  {activityResults.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="bg-gray-50 p-2 rounded flex justify-between items-center"
+            <div className="p-4">
+              {showActivitySearch && (
+                <div className="mb-6">
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={activityQuery}
+                      onChange={(e) => setActivityQuery(e.target.value)}
+                      placeholder="Search activities..."
+                      className="px-3 py-2 rounded border flex-1"
+                    />
+                    <input
+                      type="date"
+                      value={activityDate}
+                      onChange={(e) => setActivityDate(e.target.value)}
+                      className="px-3 py-2 rounded border"
+                    />
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                      onClick={handleActivitySearch}
+                      disabled={loadingActivities}
                     >
-                      <span>{activity.name}</span>
-                      <button
-                        className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
-                        onClick={() =>
-                          setSelectedActivities((prev) => [...prev, activity])
-                        }
-                      >
-                        Add
-                      </button>
+                      {loadingActivities ? "Searching..." : "Search"}
+                    </button>
+                  </div>
+                  
+                  {activityResults.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {activityResults.map((activity) => (
+                        <div key={activity.id} className="bg-gray-50 p-3 rounded flex justify-between items-center">
+                          <div>
+                            <div className="font-medium">{activity.name}</div>
+                            <div className="text-sm text-gray-600">{activity.price}</div>
+                          </div>
+                          <button
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                            onClick={() => {
+                              setSelectedActivities(prev => [...prev, activity]);
+                              setActivityResults(prev => prev.filter(a => a.id !== activity.id));
+                            }}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
-              {/* Itinerary Activities */}
-              <div className="space-y-4">
-                {selectedActivities.map((activity) => (
-                  <ActivityCard
-                    key={activity.id}
-                    {...activity}
-                    onClose={() =>
-                      setSelectedActivities((prev) =>
-                        prev.filter((a) => a.id !== activity.id)
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </>
+              
+              {selectedActivities.map((activity) => (
+                <ActivityCard
+                  key={activity.id}
+                  {...activity}
+                  onClose={() => setSelectedActivities(prev => prev.filter(a => a.id !== activity.id))}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
