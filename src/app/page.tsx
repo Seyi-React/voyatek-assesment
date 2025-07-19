@@ -108,64 +108,66 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Center: Main Nav (horizontal, icons above text) */}
-          <nav className="hidden md:flex items-end space-x-2 mx-2">
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <Menu className="w-5 h-5 mb-1" />
-              Home
-            </div>
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <LayoutDashboard className="w-5 h-5 mb-1" />
-              Dashboard
-            </div>
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <Wallet className="w-5 h-5 mb-1" />
-              Wallet
-            </div>
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <Calendar className="w-5 h-5 mb-1" />
-              Plan a Trip
-            </div>
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <User className="w-5 h-5 mb-1" />
-              Commission for Life
-            </div>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold mx-2 hidden md:block">
-              Subscribe
-            </button>
-          </nav>
+          {/* Right: All Navs Side by Side */}
+          <div className="flex items-center gap-3 md:gap-4">
+            {/* Main Nav */}
+            <nav className="hidden md:flex items-end gap-3 mx-2">
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <Menu className="w-5 h-5 mb-1" />
+                Home
+              </div>
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <LayoutDashboard className="w-5 h-5 mb-1" />
+                Dashboard
+              </div>
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <Wallet className="w-5 h-5 mb-1" />
+                Wallet
+              </div>
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <Calendar className="w-5 h-5 mb-1" />
+                Plan a Trip
+              </div>
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <User className="w-5 h-5 mb-1" />
+                Commission for Life
+              </div>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold mx-2 hidden md:block">
+                Subscribe
+              </button>
+            </nav>
 
-          {/* Divider */}
-          <div className="hidden md:block h-8 border-l border-gray-300 mx-1" />
+            {/* Divider */}
+            <div className="hidden md:block h-8 border-l border-gray-300 mx-2" />
 
-          {/* Right: Secondary Nav */}
-          <nav className="hidden md:flex items-end space-x-6 mx-0">
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <Bell className="w-5 h-5 mb-1" />
-              Notification
-            </div>
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <ShoppingCart className="w-5 h-5 mb-1" />
-              Carts
-            </div>
-            <div className="flex flex-col items-center text-xs text-gray-500">
-              <PlusCircle className="w-5 h-5 mb-1" />
-              Create
-            </div>
-          </nav>
+            {/* Secondary Nav */}
+            <nav className="hidden md:flex items-end gap-4 mx-0">
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <Bell className="w-5 h-5 mb-1" />
+                Notification
+              </div>
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <ShoppingCart className="w-5 h-5 mb-1" />
+                Carts
+              </div>
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <PlusCircle className="w-5 h-5 mb-1" />
+                Create
+              </div>
+            </nav>
 
-          {/* Avatar with Dropdown */}
-          <div className="relative ml-1">
-            <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none">
-              <Image
-                src="/woman.svg"
-                alt="Avatar"
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            </button>
-          
+            {/* Avatar with Dropdown */}
+            <div className="relative ml-2">
+              <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center focus:outline-none">
+                <Image
+                  src="/woman.svg"
+                  alt="Avatar"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              </button>
+            </div>
           </div>
         </div>
       </header>
